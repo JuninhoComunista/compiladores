@@ -1,4 +1,5 @@
 #include "tokens.h"
+#include "hash.h"
 #include <stdio.h>
 
 extern int yylex();
@@ -6,7 +7,6 @@ extern char* yytext;
 extern int lineCount;
 
 int main(void) {
-    
     int ntoken;
     ntoken = yylex();
     while (ntoken)
@@ -36,7 +36,8 @@ int main(void) {
                 printf("String %s\n", yytext);
                 break;
             case TK_IDENTIFIER:
-                printf("Identifier \"%s\"\n", yytext);
+                // printf("Identifier \"%s\"\n", yytext);
+                printf("Hash value of \"%s\": %lu\n", yytext, hash_function(yytext));
                 break;
             case TOKEN_ERROR:
                 printf("Invalid token \"%s\" in line %d\n", yytext, lineCount);
