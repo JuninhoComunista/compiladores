@@ -1,8 +1,10 @@
 int
 char
-asuhduashduasd
+print
+\#char_int
 1234,15
-124,059
-[
-    
-]
+15,059
+a <-10 - 5
+'1''2''A' 'a' '!' '@' '#' '|' '\' '^'
+#\
+"Sou uma \n \" string""Tambem sou"

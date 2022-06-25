@@ -1,18 +1,26 @@
 %{
     #include "tokens.h"
-    int countLines = 1;
+    int lineCount = 1;
     int running = 1;
 
     int isRunning(void);
     int getLineNumber(void);
 %}
 
+%x COMMENT
 
 %%
+
+"##".*              {}
+"\\#"               {BEGIN COMMENT;}
+<COMMENT>\n         {lineCount++;}
+<COMMENT>"#\\"      {BEGIN INITIAL;}
+<COMMENT>.          {}
 
 "char"              {return KW_CHAR;}
 "int"               {return KW_INT;}
 "float"             {return KW_FLOAT;}
+
 "if"                {return KW_IF;}
 "else"              {return KW_ELSE;}
 "while"             {return KW_WHILE;}
@@ -22,15 +30,24 @@
 
 [-;()[\]{}+./<>&|~] {return yytext[0];}
 
-[1-9][0-9]*         {return LIT_INTEGER;}
-[1-9][0-9]*,[0-9]+  {return LIT_FLOAT;}
+(<-)                {return ASSIGNMENT;}
+(<=)                {return OPERATOR_LE;}    
+(>=)                {return OPERATOR_GE;}
+(==)                {return OPERATOR_EQ;}
+(!=)                {return OPERATOR_DIF;}
 
-[a-zA-Z]*           {return TK_IDENTIFIER;}
+[a-z_A-Z]*          {return TK_IDENTIFIER;}
+
+[0-9]+              {return LIT_INTEGER;}
+[0-9]+,[0-9]+       {return LIT_FLOAT;}
+\'.\'               {return LIT_CHAR;}
+\"(\\.|[^"\\])*\"   {return LIT_STRING;}
 
 [ \t]*              {}
-\n                  {countLines++;}
+\n                  {lineCount++;}
 
-.*                  {return TOKEN_ERROR;}
+.                   {return TOKEN_ERROR;}
+
 %%
 
 #include "main.c"
@@ -40,7 +57,7 @@ int isRunning(void) {
 }
 
 int getLineNumber(void) {
-    return countLines;
+    return lineCount;
 }
 
 int yywrap(void) {
