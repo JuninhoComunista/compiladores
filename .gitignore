@@ -1,3 +1,5 @@
 lex.yy.c
 etapa1
 config.txt
+.vscode/
+in.txt

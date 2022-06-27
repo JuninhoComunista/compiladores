@@ -1,10 +1,18 @@
 %{
     #include "tokens.h"
+    #include "hash.h"
     int lineCount = 1;
     int running = 1;
+    HashTable* identifiersTable;
 
     int isRunning(void);
     int getLineNumber(void);
+
+    void initMe(void);
+
+    void initMe(void) { 
+        identifiersTable = createTable();
+    }
 %}
 
 %x COMMENT
@@ -36,7 +44,7 @@
 (==)                {return OPERATOR_EQ;}
 (!=)                {return OPERATOR_DIF;}
 
-[a-z_A-Z]*          {return TK_IDENTIFIER;}
+[a-z_A-Z]*          {hashInsert(identifiersTable, yytext, yytext); return TK_IDENTIFIER;}
 
 [0-9]+              {return LIT_INTEGER;}
 [0-9]+,[0-9]+       {return LIT_FLOAT;}
@@ -63,5 +71,6 @@ int getLineNumber(void) {
 int yywrap(void) {
     running = 0;
     printf("Total number of lines: %d\n", getLineNumber());
+    printTable(identifiersTable);
     return 1;
 }
