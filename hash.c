@@ -1,3 +1,4 @@
+//Nome: Nicolas Paris - Cartao: 302650
 #include "hash.h"
 
 // Linked list functions

@@ -1,3 +1,4 @@
+//Nome: Nicolas Paris - Cartao: 302650
 #include "tokens.h"
 #include "hash.h"
 #include <stdio.h>
@@ -65,11 +66,6 @@ int main(int argc, char** argv) {
               printf("Operator %s\n", yytext);
       }
     }
-    
-    printf("Antes\n");
-    char * cu = hashSearch(identifiersTable, "F");
-    printf("depois\n");
-    printf("Search = %s\n", hashSearch(identifiersTable, "F"));
 
     printf("table numElements: %d\n", identifiersTable->numElements);
     
