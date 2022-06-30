@@ -6,9 +6,6 @@
 #ifndef HASH_H
 #define HASH_H
 
-#define INITIAL_SIZE 78467
-extern int tableSize;
-
 typedef struct HashNode {
     char* key;
     char* value;
@@ -34,7 +31,7 @@ void listDestroy(LinkedList* list);
 
 unsigned long hashFunction(char *str);
 HashNode* createNode(char *key, char *value);
-HashTable* createTable();
+HashTable* createTable(int tableSize);
 LinkedList** createOverflowBuckets(HashTable* table);
 void destroyNode(HashNode* node);
 void destroyTable(HashTable* table);

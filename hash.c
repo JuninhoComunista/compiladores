@@ -1,7 +1,5 @@
 #include "hash.h"
 
-int tableSize = INITIAL_SIZE;
-
 //Linked list functions
 
 LinkedList* listAllocate() {
@@ -60,7 +58,6 @@ void listDestroy(LinkedList* list) {
         free(temp->node);
         free(temp);
     }
-    
 }
 
 //HashTable functions
@@ -72,7 +69,7 @@ unsigned long hashFunction(char *str) {
     while (c = *str++)
         hash = ((hash << 5) + hash) + c;
 
-    return hash%tableSize;
+    return hash;
 }
 
 HashNode* createNode(char *key, char *value) {
@@ -86,7 +83,7 @@ HashNode* createNode(char *key, char *value) {
     return node;
 }
 
-HashTable* createTable() {
+HashTable* createTable(int tableSize) {
     HashTable* table = (HashTable*) malloc(sizeof(HashTable));
     table->size = tableSize;
     table->numElements = 0;
@@ -132,22 +129,19 @@ void destroyOverflowBuckets(HashTable* table) {
 
 void hashInsert(HashTable* table, char* key, char* value) {
     HashNode* node = createNode(key, value);
-    unsigned long index = hashFunction(key);
-    HashNode* currentNode = table->nodes[index];
+    unsigned long index;
+    HashNode* currentNode;
+    index = hashFunction(key)%table->size;
+    currentNode = table->nodes[index];
     if (currentNode == NULL) {
-        if (table->numElements == table->size) {
-            //TODO implement rehashing
-            printf("Error inserting: Hash table is full\n");
-            destroyNode(node);
-            return;
-        }
         table->nodes[index] = node;
+        table->numElements++;
     } else if (strcmp(currentNode->key, key) == 0) {
         strcpy(table->nodes[index]->value, value);
     } else {
         handleCollision(table, index, node);
+        table->numElements++;
     }
-    table->numElements++;
 }
 
 char* hashSearch(HashTable* table, char* key) {
@@ -183,9 +177,9 @@ void handleCollision(HashTable* table, unsigned long index, HashNode* node) {
 
 void printTable(HashTable* table) {
     printf("\n-------------------\n");
-    for (int i=0; i<table->size; i++) {
+    for (int i=0; i < table->size; i++) {
         if (table->nodes[i]) {
-            printf("Index:%d, Key:%s, Value:%s", i, table->nodes[i]->key, table->nodes[i]->value);
+            printf("Index:%d, Value:%s", i, table->nodes[i]->value);
             if (table->overflowBuckets[i]) {
                 printf(" => Overflow Bucket => ");
                 LinkedList* head = table->overflowBuckets[i];

@@ -1,6 +1,8 @@
 %{
     #include "tokens.h"
     #include "hash.h"
+
+    #define TABLESIZE 78467
     int lineCount = 1;
     int running = 1;
     HashTable* identifiersTable;
@@ -11,7 +13,7 @@
     void initMe(void);
 
     void initMe(void) { 
-        identifiersTable = createTable();
+        identifiersTable = createTable(TABLESIZE);
     }
 %}
 
@@ -46,10 +48,10 @@
 
 [a-z_A-Z]*          {hashInsert(identifiersTable, yytext, yytext); return TK_IDENTIFIER;}
 
-[0-9]+              {return LIT_INTEGER;}
-[0-9]+,[0-9]+       {return LIT_FLOAT;}
-\'.\'               {return LIT_CHAR;}
-\"(\\.|[^"\\])*\"   {return LIT_STRING;}
+[0-9]+              {hashInsert(identifiersTable, yytext, yytext); return LIT_INTEGER;}
+[0-9]+,[0-9]+       {hashInsert(identifiersTable, yytext, yytext); return LIT_FLOAT;}
+\'.\'               {hashInsert(identifiersTable, yytext, yytext); return LIT_CHAR;}
+\"(\\.|[^"\\])*\"   {hashInsert(identifiersTable, yytext, yytext); return LIT_STRING;}
 
 [ \t]*              {}
 \n                  {lineCount++;}
