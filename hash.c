@@ -1,6 +1,6 @@
 #include "hash.h"
 
-//Linked list functions
+// Linked list functions
 
 LinkedList* listAllocate() {
     LinkedList* list = (LinkedList*) malloc(sizeof(LinkedList));
@@ -15,30 +15,23 @@ LinkedList* listInsert(LinkedList* list, HashNode* node) {
         list = head;
         return list;
     }
-    
-    LinkedList* temp = list;
-    while (temp->next) {
-        if (strcmp(temp->node->key, node->key) != 0) {
-            LinkedList* newElement = listAllocate();
-            newElement->node = node;
-            newElement->next = list;
-            return newElement;
-        }
-    }
 
-    return list;
+    LinkedList *newElement = listAllocate();
+    newElement->node = node;
+    newElement->next = list;
+    return newElement;
 }
 
-HashNode* listRemove(LinkedList* list) {
-    if (!list || !list->next) {
+HashNode *listRemove(LinkedList *list) {
+    if (!list || !list->next){
         return NULL;
     }
 
-    LinkedList* next = list->next;
-    LinkedList* temp = list;
+    LinkedList *next = list->next;
+    LinkedList *temp = list;
     temp->next = NULL;
     list = next;
-    HashNode* it = NULL;
+    HashNode *it = NULL;
     memcpy(temp->node, it, sizeof(HashNode));
     free(temp->node->key);
     free(temp->node->value);
@@ -47,10 +40,9 @@ HashNode* listRemove(LinkedList* list) {
     return it;
 }
 
-void listDestroy(LinkedList* list) {
-    LinkedList* temp = list;
-    while (list)
-    {
+void listDestroy(LinkedList *list) {
+    LinkedList *temp = list;
+    while (list) {
         temp = list;
         list = list->next;
         free(temp->node->key);
@@ -60,7 +52,7 @@ void listDestroy(LinkedList* list) {
     }
 }
 
-//HashTable functions
+// HashTable functions
 
 unsigned long hashFunction(char *str) {
     unsigned long hash = 5381;
@@ -140,7 +132,6 @@ void hashInsert(HashTable* table, char* key, char* value) {
         strcpy(table->nodes[index]->value, value);
     } else {
         handleCollision(table, index, node);
-        table->numElements++;
     }
 }
 
@@ -163,28 +154,35 @@ char* hashSearch(HashTable* table, char* key) {
     return NULL;
 }
 
-void handleCollision(HashTable* table, unsigned long index, HashNode* node) {
-    LinkedList* head = table->overflowBuckets[index];
+void handleCollision(HashTable *table, unsigned long index, HashNode *node) {
+    LinkedList *head = table->overflowBuckets[index];
 
     if (head == NULL) {
         head = listAllocate();
         head->node = node;
         table->overflowBuckets[index] = head;
     } else {
+        LinkedList *temp = head;
+        while (temp) {
+            if (strcmp(temp->node->key, node->key) == 0)
+                return;
+            temp = temp->next;
+        }
         table->overflowBuckets[index] = listInsert(head, node);
+        table->numElements++;
     }
 }
 
-void printTable(HashTable* table) {
+void printTable(HashTable *table) {
     printf("\n-------------------\n");
-    for (int i=0; i < table->size; i++) {
+    for (int i = 0; i < table->size; i++) {
         if (table->nodes[i]) {
             printf("Index:%d, Value:%s", i, table->nodes[i]->value);
             if (table->overflowBuckets[i]) {
                 printf(" => Overflow Bucket => ");
-                LinkedList* head = table->overflowBuckets[i];
+                LinkedList *head = table->overflowBuckets[i];
                 while (head) {
-                    printf("Key:%s, Value:%s ", head->node->key, head->node->value);
+                    printf("Value:%s ", head->node->value);
                     head = head->next;
                 }
             }
