@@ -2,7 +2,8 @@
     #include "tokens.h"
     #include "hash.h"
 
-    #define TABLESIZE 78467
+    #define TABLESIZE 499
+    #define THRESHOLD 80
     int lineCount = 1;
     int running = 1;
     HashTable* identifiersTable;
@@ -13,7 +14,7 @@
     void initMe(void);
 
     void initMe(void) { 
-        identifiersTable = createTable(TABLESIZE);
+        identifiersTable = createTable(TABLESIZE, (float)THRESHOLD/100);
     }
 %}
 

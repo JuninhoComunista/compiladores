@@ -83,9 +83,10 @@ HashNode* createNode(char *key, char *value) {
     return node;
 }
 
-HashTable* createTable(int tableSize) {
+HashTable* createTable(int tableSize, float threshold) {
     HashTable* table = (HashTable*) malloc(sizeof(HashTable));
     table->size = tableSize;
+    table->threshold = threshold;
     table->numElements = 0;
     table->nodes = (HashNode**) calloc(table->size, sizeof(HashNode*));
     table->overflowBuckets = createOverflowBuckets(table);
@@ -142,6 +143,9 @@ void hashInsert(HashTable* table, char* key, char* value) {
         handleCollision(table, index, node);
         table->numElements++;
     }
+    if (table->numElements >= (table->size * table->threshold)) {
+        hashResize(table);
+    }
 }
 
 char* hashSearch(HashTable* table, char* key) {
@@ -175,11 +179,32 @@ void handleCollision(HashTable* table, unsigned long index, HashNode* node) {
     }
 }
 
+HashTable* hashResize(HashTable* table) {
+    int oldTableSize = table->size;
+    float threshold = table->threshold;
+    HashTable* oldTable = table;
+    table = createTable(oldTableSize*2, threshold);
+    for(int i=0; i < oldTableSize; i++) {
+        if (oldTable->nodes[i]) {
+            hashInsert(table, oldTable->nodes[i]->key, oldTable->nodes[i]->value);
+            if (oldTable->overflowBuckets[i]) {
+                LinkedList* head = oldTable->overflowBuckets[i];
+                while(head) {
+                    hashInsert(table, head->node->key, head->node->value);
+                    head = head->next;
+                }
+            }
+        }  
+    }
+    destroyTable(oldTable);
+    return table;
+}
+
 void printTable(HashTable* table) {
     printf("\n-------------------\n");
     for (int i=0; i < table->size; i++) {
         if (table->nodes[i]) {
-            printf("Index:%d, Value:%s", i, table->nodes[i]->value);
+            printf("Index:%d, Key:%s, Value:%s", i, table->nodes[i]->key, table->nodes[i]->value);
             if (table->overflowBuckets[i]) {
                 printf(" => Overflow Bucket => ");
                 LinkedList* head = table->overflowBuckets[i];
