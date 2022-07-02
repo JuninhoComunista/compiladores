@@ -60,7 +60,7 @@
 
 %%
 
-#include "main.c"
+#include "main.h"
 
 int isRunning(void) {
     return running;
@@ -71,7 +71,7 @@ int getLineNumber(void) {
 }
 
 void initMe(void) { 
-    identifiersTable = createTable(TABLESIZE);
+    identifiersTable = createTable(TABLESIZE, THRESHOLD);
 }
 
 int yywrap(void) {

@@ -1,6 +1,8 @@
-lex.yy.c
+lex.yy.*
 etapa1
 config.txt
 .vscode/
 in.txt
 etapa1.tgz
+*.o
+*.d
