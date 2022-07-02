@@ -194,8 +194,6 @@ void hashResize(HashTable* table) {
             }
         }  
     }
-    printTable(table);
-    printTable(oldTable);
     destroyTable(oldTable);
 }
 
