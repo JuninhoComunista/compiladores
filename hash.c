@@ -141,7 +141,7 @@ void hashInsert(HashTable* table, char* key, char* value) {
 }
 
 char* hashSearch(HashTable* table, char* key) {
-    unsigned long index = hashFunction(key);
+    unsigned long index = hashFunction(key)%table->size;
     HashNode* node = table->nodes[index];
     LinkedList* head = table->overflowBuckets[index];
 
