@@ -21,7 +21,7 @@ typedef struct HashTable {
     HashNode **nodes;
     LinkedList** overflowBuckets;
     int size;
-    int numElements;
+    int usedIndexes;
     float threshold;
 } HashTable;
 
@@ -40,6 +40,6 @@ void destroyOverflowBuckets(HashTable* table);
 void hashInsert(HashTable* table, char* key, char* value);
 char* hashSearch(HashTable* table, char* key);
 void handleCollision(HashTable* table, unsigned long index, HashNode* node);
-HashTable* hashResize(HashTable* table);
+void hashResize(HashTable* table);
 void printTable(HashTable* table);
 

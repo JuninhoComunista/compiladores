@@ -71,7 +71,7 @@ int getLineNumber(void) {
 }
 
 void initMe(void) { 
-    identifiersTable = createTable(TABLESIZE, THRESHOLD);
+    identifiersTable = createTable(TABLESIZE, (float)THRESHOLD/100);
 }
 
 int yywrap(void) {

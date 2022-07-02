@@ -80,7 +80,7 @@ HashTable* createTable(int tableSize, float threshold) {
     HashTable* table = (HashTable*) malloc(sizeof(HashTable));
     table->size = tableSize;
     table->threshold = threshold;
-    table->numElements = 0;
+    table->usedIndexes = 0;
     table->nodes = (HashNode**) calloc(table->size, sizeof(HashNode*));
     table->overflowBuckets = createOverflowBuckets(table);
     for (int i=0; i < table->size; i++)
@@ -129,13 +129,13 @@ void hashInsert(HashTable* table, char* key, char* value) {
     currentNode = table->nodes[index];
     if (currentNode == NULL) {
         table->nodes[index] = node;
-        table->numElements++;
+        table->usedIndexes++;
     } else if (strcmp(currentNode->key, key) == 0) {
         strcpy(table->nodes[index]->value, value);
     } else {
         handleCollision(table, index, node);
     }
-    if (table->numElements >= (table->size * table->threshold)) {
+    if (table->usedIndexes >= (table->size * table->threshold)) {
         hashResize(table);
     }
 }
@@ -174,11 +174,10 @@ void handleCollision(HashTable *table, unsigned long index, HashNode *node) {
             temp = temp->next;
         }
         table->overflowBuckets[index] = listInsert(head, node);
-        table->numElements++;
     }
 }
 
-HashTable* hashResize(HashTable* table) {
+void hashResize(HashTable* table) {
     int oldTableSize = table->size;
     float threshold = table->threshold;
     HashTable* oldTable = table;
@@ -195,8 +194,9 @@ HashTable* hashResize(HashTable* table) {
             }
         }  
     }
+    printTable(table);
+    printTable(oldTable);
     destroyTable(oldTable);
-    return table;
 }
 
 void printTable(HashTable* table) {

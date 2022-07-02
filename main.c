@@ -67,7 +67,7 @@ int main(int argc, char** argv) {
       }
     }
 
-    printf("table numElements: %d\n", identifiersTable->numElements);
+    printf("table numElements: %d\n", identifiersTable->usedIndexes);
     
     return 0;
 }
