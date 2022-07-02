@@ -4,8 +4,7 @@
 #include <malloc.h>
 #include <stdlib.h>
 
-#ifndef HASH_H
-#define HASH_H
+#pragma once
 
 typedef struct HashNode {
     char* key;
@@ -43,6 +42,4 @@ char* hashSearch(HashTable* table, char* key);
 void handleCollision(HashTable* table, unsigned long index, HashNode* node);
 HashTable* hashResize(HashTable* table);
 void printTable(HashTable* table);
-
-#endif
 
