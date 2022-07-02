@@ -4,4 +4,4 @@ lex.yy.c: scanner.l
 		lex scanner.l
 
 clean:	
-		rm lex.yy.c etapa1 hash.o
+		rm lex.yy.c etapa1

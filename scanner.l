@@ -1,9 +1,11 @@
 %{
+    //Nome: Nicolas Paris - Cartao: 302650
     #include "tokens.h"
     #include "hash.h"
 
     #define TABLESIZE 499
     #define THRESHOLD 80
+
     int lineCount = 1;
     int running = 1;
     HashTable* identifiersTable;
@@ -13,9 +15,6 @@
 
     void initMe(void);
 
-    void initMe(void) { 
-        identifiersTable = createTable(TABLESIZE, (float)THRESHOLD/100);
-    }
 %}
 
 %x COMMENT
@@ -71,9 +70,13 @@ int getLineNumber(void) {
     return lineCount;
 }
 
+void initMe(void) { 
+    identifiersTable = createTable(TABLESIZE);
+}
+
 int yywrap(void) {
     running = 0;
-    printf("Total number of lines: %d\n", getLineNumber());
     printTable(identifiersTable);
+    printf("Total number of lines: %d\n", getLineNumber());
     return 1;
 }
