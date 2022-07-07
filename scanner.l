@@ -3,7 +3,7 @@
     #include "tokens.h"
     #include "hash.h"
 
-    #define TABLESIZE 499
+    #define TABLESIZE 997
     int lineCount = 1;
     int running = 1;
     HashTable* identifiersTable;
