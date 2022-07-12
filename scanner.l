@@ -3,7 +3,7 @@
     #include "tokens.h"
     #include "hash.h"
 
-    #define TABLESIZE 499
+    #define TABLESIZE 997
     #define THRESHOLD 80
 
     int lineCount = 1;
