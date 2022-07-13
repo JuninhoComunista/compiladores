@@ -1,10 +1,10 @@
 //Nome: Nicolas Paris - Cartao: 302650
+
+#pragma once
+
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#ifndef HASH_H
-#define HASH_H
 
 typedef struct HashNode {
     char* key;
@@ -40,5 +40,3 @@ void hashInsert(HashTable* table, char* key, char* value);
 char* hashSearch(HashTable* table, char* key);
 void handleCollision(HashTable* table, unsigned long index, HashNode* node);
 void printTable(HashTable* table);
-
-#endif

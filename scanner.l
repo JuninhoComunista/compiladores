@@ -4,7 +4,6 @@
     #include "hash.h"
 
     #define TABLESIZE 997
-    #define THRESHOLD 80
 
     int lineCount = 1;
     int running = 1;
@@ -71,7 +70,7 @@ int getLineNumber(void) {
 }
 
 void initMe(void) { 
-    identifiersTable = createTable(TABLESIZE, THRESHOLD);
+    identifiersTable = createTable(TABLESIZE);
 }
 
 int yywrap(void) {
