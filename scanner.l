@@ -1,7 +1,8 @@
 %{
     //Nome: Nicolas Paris - Cartao: 302650
-    #include "tokens.h"
     #include "hash.h"
+    #include "types.h"
+    #include "tokens.h"
 
     #define TABLESIZE 997
 
@@ -45,12 +46,12 @@
 (==)                {return OPERATOR_EQ;}
 (!=)                {return OPERATOR_DIF;}
 
-[a-z_A-Z]*          {hashInsert(identifiersTable, yytext, yytext); return TK_IDENTIFIER;}
+[a-z_A-Z]*          {hashInsert(identifiersTable, yytext, yytext, SYMBOL_IDENTIFIER); return TK_IDENTIFIER;}
 
-[0-9]+              {hashInsert(identifiersTable, yytext, yytext); return LIT_INTEGER;}
-[0-9]+,[0-9]+       {hashInsert(identifiersTable, yytext, yytext); return LIT_FLOAT;}
-\'.\'               {hashInsert(identifiersTable, yytext, yytext); return LIT_CHAR;}
-\"(\\.|[^"\\])*\"   {hashInsert(identifiersTable, yytext, yytext); return LIT_STRING;}
+[0-9]+              {hashInsert(identifiersTable, yytext, yytext, SYMBOL_INT); return LIT_INTEGER;}
+[0-9]+,[0-9]+       {hashInsert(identifiersTable, yytext, yytext, SYMBOL_FLOAT); return LIT_FLOAT;}
+\'.\'               {hashInsert(identifiersTable, yytext, yytext, SYMBOL_CHAR); return LIT_CHAR;}
+\"(\\.|[^"\\])*\"   {hashInsert(identifiersTable, yytext, yytext, SYMBOL_STRING); return LIT_STRING;}
 
 [ \t]*              {}
 \n                  {lineCount++;}

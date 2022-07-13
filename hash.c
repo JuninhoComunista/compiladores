@@ -65,10 +65,11 @@ unsigned long hashFunction(char *str) {
     return hash;
 }
 
-HashNode* createNode(char *key, char *value) {
+HashNode* createNode(char *key, char *value, int type) {
     HashNode* node = (HashNode*) malloc(sizeof(HashNode));
     node->key = (char*) malloc(strlen(key)+1);
     node->value = (char*) malloc(strlen(value)+1);
+    node->type = type;
 
     strcpy(node->key, key);
     strcpy(node->value, value);
@@ -120,8 +121,8 @@ void destroyOverflowBuckets(HashTable* table) {
     free(buckets);
 }
 
-void hashInsert(HashTable* table, char* key, char* value) {
-    HashNode* node = createNode(key, value);
+void hashInsert(HashTable* table, char* key, char* value, int type) {
+    HashNode* node = createNode(key, value, type);
     unsigned long index;
     HashNode* currentNode;
     index = hashFunction(key)%table->size;

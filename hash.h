@@ -9,6 +9,7 @@
 typedef struct HashNode {
     char* key;
     char* value;
+    int type;
 }HashNode;
 
 typedef struct LinkedList LinkedList;
@@ -30,13 +31,13 @@ HashNode* listRemove(LinkedList* list);
 void listDestroy(LinkedList* list);
 
 unsigned long hashFunction(char *str);
-HashNode* createNode(char *key, char *value);
+HashNode* createNode(char *key, char *value, int type);
 HashTable* createTable(int tableSize);
 LinkedList** createOverflowBuckets(HashTable* table);
 void destroyNode(HashNode* node);
 void destroyTable(HashTable* table);
 void destroyOverflowBuckets(HashTable* table);
-void hashInsert(HashTable* table, char* key, char* value);
+void hashInsert(HashTable* table, char* key, char* value, int type);
 char* hashSearch(HashTable* table, char* key);
 void handleCollision(HashTable* table, unsigned long index, HashNode* node);
 void printTable(HashTable* table);
