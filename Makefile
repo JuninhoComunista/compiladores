@@ -6,7 +6,9 @@ hash.o: hash.c
 	gcc -c hash.c
 lex.yy.o: lex.yy.c
 	gcc -c lex.yy.c
-lex.yy.c: scanner.l
+lex.yy.c: scanner.l y.tab
 	flex --header-file=lex.yy.h scanner.l 
+y.tab:
+	yacc -d parser.y
 clean:
-	rm *.o *.d lex.yy.* etapa1
+	rm *.o *.d lex.yy.* y.tab.* etapa1
