@@ -2,7 +2,7 @@
     //Nome: Nicolas Paris - Cartao: 302650
     #include "hash.h"
     #include "types.h"
-    #include "tokens.h"
+    #include "y.tab.h"
 
     #define TABLESIZE 997
 
@@ -76,7 +76,7 @@ void initMe(void) {
 
 int yywrap(void) {
     running = 0;
-    printTable(identifiersTable);
+    // printTable(identifiersTable);
     printf("Total number of lines: %d\n", getLineNumber());
     return 1;
 }
