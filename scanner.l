@@ -10,10 +10,10 @@
     int running = 1;
     HashTable* identifiersTable;
 
-    int isRunning(void);
-    int getLineNumber(void);
+    int isRunning();
+    int getLineNumber();
 
-    void initMe(void);
+    void initMe();
 
 %}
 
@@ -62,19 +62,19 @@
 
 #include "main.h"
 
-int isRunning(void) {
+int isRunning() {
     return running;
 }
 
-int getLineNumber(void) {
+int getLineNumber() {
     return lineCount;
 }
 
-void initMe(void) { 
+void initMe() { 
     identifiersTable = createTable(TABLESIZE);
 }
 
-int yywrap(void) {
+int yywrap() {
     running = 0;
     // printTable(identifiersTable);
     printf("Total number of lines: %d\n", getLineNumber());

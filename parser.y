@@ -1,3 +1,7 @@
+%{
+    //Nome: Nicolas Paris - Cartao: 302650
+    int yyerror();
+%}
 
 %token KW_CHAR      
 %token KW_INT       
@@ -27,6 +31,9 @@
 
 %%
 
+program: ;
+
 
 %%
 
+int yyerror()
