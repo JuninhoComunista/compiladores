@@ -27,7 +27,14 @@
 %token LIT_CHAR     
 %token LIT_STRING   
 
-%token TOKEN_ERROR  
+%token TOKEN_ERROR
+
+%left '<' '>' '&' OPERATOR_DIF OPERATOR_EQ OPERATOR_GE OPERATOR_LE
+%left '|'
+%left '^'
+%right '~'
+%left '+' '-'
+%left '.' '/'
 
 %%
 
@@ -36,4 +43,7 @@ program: ;
 
 %%
 
-int yyerror()
+int yyerror() {
+    fprintf(stderr, "Syntax error at line %d \n", getLineNumber());
+    exit(3);
+}
