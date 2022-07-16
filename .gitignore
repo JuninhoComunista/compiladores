@@ -3,6 +3,7 @@ etapa1
 config.txt
 .vscode/
 in.txt
+test.txt
 etapa1.tgz
 *.o
 *.d

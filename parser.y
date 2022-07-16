@@ -1,7 +1,13 @@
 %{
     //Nome: Nicolas Paris - Cartao: 302650
+    #include <stdio.h>
+    #include <stdlib.h>
     int yyerror();
+    extern int getLineNumber();
 %}
+
+%union {char *symbol;}
+%start program
 
 %token KW_CHAR      
 %token KW_INT       
@@ -38,8 +44,46 @@
 
 %%
 
-program: ;
+program: 
+    declarationList
+    /* | functionList */
+    ;
 
+declarationList:
+    declaration declarationList
+    |
+    ;
+
+declaration:
+    type identifier '(' literal ')' ';'
+    | type identifier '[' LIT_INTEGER ']' literalList ';'
+    ;
+
+/* functionList:
+    function functionList
+    |
+    ; */
+
+type:
+    KW_CHAR
+    | KW_INT
+    | KW_FLOAT
+    ;
+
+identifier:
+    TK_IDENTIFIER
+    ;
+
+literalList:
+    literal literalList
+    |
+    ;
+
+literal:
+    LIT_CHAR
+    | LIT_INTEGER
+    | LIT_FLOAT
+    ;
 
 %%
 
