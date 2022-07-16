@@ -46,7 +46,7 @@
 
 program: 
     declarationList
-    /* | functionList */
+    | functionList
     ;
 
 declarationList:
@@ -59,10 +59,27 @@ declaration:
     | type identifier '[' LIT_INTEGER ']' literalList ';'
     ;
 
-/* functionList:
+functionList:
     function functionList
     |
-    ; */
+    ;
+
+function:
+    type identifier '(' parameterList ')' block
+    ;
+
+parameterList:
+    parameter parameterList
+    |
+    ;
+
+parameter: 
+    type identifier
+    ;
+
+block:
+    '{' '}'
+    ;
 
 type:
     KW_CHAR
