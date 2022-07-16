@@ -44,27 +44,22 @@
 
 %%
 
-program: 
+program:
     declarationList
-    | functionList
     ;
 
 declarationList:
-    declaration declarationList
+    variableDeclaration declarationList
+    | functionDeclaration declarationList
     |
     ;
 
-declaration:
+variableDeclaration:
     type identifier '(' literal ')' ';'
     | type identifier '[' LIT_INTEGER ']' literalList ';'
     ;
 
-functionList:
-    function functionList
-    |
-    ;
-
-function:
+functionDeclaration:
     type identifier '(' parameterList ')' block
     ;
 
@@ -78,7 +73,60 @@ parameter:
     ;
 
 block:
-    '{' '}'
+    '{' commandList '}'
+    ;
+
+commandList:
+    command ';' commandList
+    | command
+    ;
+
+command:
+    identifier ASSIGNMENT expression
+    | identifier '[' expression ']' ASSIGNMENT expression
+    | read
+    | print
+    | return
+    |
+    ;
+
+expressionList:
+    expression expressionList
+    |
+    ;
+
+expression:
+    identifier
+    | identifier '[' expression ']'
+    | literalWithString
+    | '(' expression ')'
+    | expression '+' expression
+    | expression '-' expression
+    | expression '.' expression
+    | expression '/' expression
+    | expression '<' expression
+    | expression '>' expression
+    | expression '|' expression
+    | expression '&' expression
+    | expression OPERATOR_LE expression
+    | expression OPERATOR_GE expression
+    | expression OPERATOR_EQ expression
+    | expression OPERATOR_DIF expression
+    | expression '~' expression
+    | '~' expression
+    ;
+
+read:
+    KW_READ identifier
+    | KW_READ identifier '[' expression ']'
+    ;
+
+print:
+    KW_PRINT expressionList
+    ;
+
+return:
+    KW_RETURN expression
     ;
 
 type:
@@ -100,6 +148,11 @@ literal:
     LIT_CHAR
     | LIT_INTEGER
     | LIT_FLOAT
+    ;
+
+literalWithString:
+    literal
+    | LIT_STRING
     ;
 
 %%
