@@ -87,6 +87,10 @@ command:
     | read
     | print
     | return
+    | block
+    | while
+    | if
+    | ifElse
     |
     ;
 
@@ -114,6 +118,7 @@ expression:
     | expression OPERATOR_DIF expression
     | expression '~' expression
     | '~' expression
+    | functionCall
     ;
 
 read:
@@ -129,6 +134,18 @@ return:
     KW_RETURN expression
     ;
 
+while:
+    KW_WHILE '(' expression ')' command
+    ;
+
+if:
+    KW_IF '(' expression ')' command
+    ;
+
+ifElse:
+    KW_IF '(' expression ')' command KW_ELSE command
+    ;
+
 type:
     KW_CHAR
     | KW_INT
@@ -137,6 +154,10 @@ type:
 
 identifier:
     TK_IDENTIFIER
+    ;
+
+functionCall:
+    identifier '(' expressionList ')'
     ;
 
 literalList:
