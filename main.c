@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
 
     yyparse();
 
-    printTable(identifiersTable);
+    // printTable(identifiersTable);
 
     // printf("table numElements: %d\n", identifiersTable->numElements);
     

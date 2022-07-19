@@ -12,4 +12,4 @@ y.tab: parser.y
 	yacc -d parser.y
 
 clean:
-	rm *.o *.d lex.yy.* y.tab.* etapa2
+	rm lex.yy.* y.tab.* *.o etapa2

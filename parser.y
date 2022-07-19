@@ -35,10 +35,10 @@
 
 %token TOKEN_ERROR
 
-%left '<' '>' '&' OPERATOR_DIF OPERATOR_EQ OPERATOR_GE OPERATOR_LE
-%left '|'
-%left '^'
+%left '<' '>'  OPERATOR_DIF OPERATOR_EQ OPERATOR_GE OPERATOR_LE
 %right '~'
+%left '&'
+%left '|'
 %left '+' '-'
 %left '.' '/'
 
@@ -102,7 +102,7 @@ expressionList:
 expression:
     identifier
     | identifier '[' expression ']'
-    | literalWithString
+    | literal
     | '(' expression ')'
     | expression '+' expression
     | expression '-' expression
@@ -127,7 +127,15 @@ read:
     ;
 
 print:
-    KW_PRINT expressionList
+    KW_PRINT printList
+    ;
+
+/* Reduce/reduce here for sure*/
+printList:
+    expression printList
+    | expression
+    | LIT_STRING printList 
+    | LIT_STRING
     ;
 
 return:
@@ -169,11 +177,6 @@ literal:
     LIT_CHAR
     | LIT_INTEGER
     | LIT_FLOAT
-    ;
-
-literalWithString:
-    literal
-    | LIT_STRING
     ;
 
 %%
