@@ -35,7 +35,7 @@
 
 %token TOKEN_ERROR
 
-%left '<' '>'  OPERATOR_DIF OPERATOR_EQ OPERATOR_GE OPERATOR_LE
+%left '<' '>' OPERATOR_DIF OPERATOR_EQ OPERATOR_GE OPERATOR_LE
 %right '~'
 %left '&'
 %left '|'
@@ -102,6 +102,7 @@ expressionList:
 expression:
     identifier
     | identifier '[' expression ']'
+    | functionCall
     | literal
     | '(' expression ')'
     | expression '+' expression
@@ -117,8 +118,6 @@ expression:
     | expression OPERATOR_EQ expression
     | expression OPERATOR_DIF expression
     | expression '~' expression
-    | '~' expression
-    | functionCall
     ;
 
 read:
@@ -130,7 +129,6 @@ print:
     KW_PRINT printList
     ;
 
-/* Reduce/reduce here for sure*/
 printList:
     expression printList
     | expression
