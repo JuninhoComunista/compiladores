@@ -10,13 +10,12 @@ typedef struct HashNode {
     char* key;
     char* value;
     int type;
-}HashNode;
+} HashNode;
 
-typedef struct LinkedList LinkedList;
-struct LinkedList {
+typedef struct LinkedList {
     HashNode* node;
-    LinkedList* next;
-};
+    struct LinkedList* next;
+} LinkedList;
 
 typedef struct HashTable {
     HashNode **nodes;
