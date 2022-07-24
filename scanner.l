@@ -1,7 +1,8 @@
 %{
     //Nome: Nicolas Paris - Cartao: 302650
     #include "hash.h"
-    #include "types.h"
+    #include "symbolTypes.h"
+    #include "ast.h"
     #include "y.tab.h"
 
     #define TABLESIZE 997

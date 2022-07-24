@@ -1,6 +1,7 @@
 //Nome: Nicolas Paris - Cartao: 302650
-#include "y.tab.h"
 #include "hash.h"
+#include "ast.h"
+#include "y.tab.h"
 #include <stdio.h>
 
 int yylex();

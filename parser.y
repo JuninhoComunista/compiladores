@@ -2,11 +2,16 @@
     //Nome: Nicolas Paris - Cartao: 302650
     #include <stdio.h>
     #include <stdlib.h>
+    #include "ast.h"
     int yyerror();
+    int yylex();
     extern int getLineNumber();
 %}
 
-%union {char *symbol;}
+%union {
+    HashNode *symbol;
+    Ast *ast;
+}
 %start program
 
 %token KW_CHAR      
