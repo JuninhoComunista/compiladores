@@ -36,7 +36,7 @@ LinkedList** createOverflowBuckets(HashTable* table);
 void destroyNode(HashNode* node);
 void destroyTable(HashTable* table);
 void destroyOverflowBuckets(HashTable* table);
-void hashInsert(HashTable* table, char* key, char* value, int type);
+HashNode* hashInsert(HashTable* table, char* key, char* value, int type);
 char* hashSearch(HashTable* table, char* key);
 void handleCollision(HashTable* table, unsigned long index, HashNode* node);
 void printTable(HashTable* table);

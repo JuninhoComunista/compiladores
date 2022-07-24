@@ -7,7 +7,6 @@
 #define MAX_SONS 4
 
 typedef struct AstNode {
-    struct Ast *node;
     int type;
     struct AstNode *son[MAX_SONS];
     HashNode *symbol;

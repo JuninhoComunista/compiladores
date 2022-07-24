@@ -121,7 +121,7 @@ void destroyOverflowBuckets(HashTable* table) {
     free(buckets);
 }
 
-void hashInsert(HashTable* table, char* key, char* value, int type) {
+HashNode* hashInsert(HashTable* table, char* key, char* value, int type) {
     HashNode* node = createNode(key, value, type);
     unsigned long index;
     HashNode* currentNode;
@@ -135,6 +135,7 @@ void hashInsert(HashTable* table, char* key, char* value, int type) {
     } else {
         handleCollision(table, index, node);
     }
+    return node;
 }
 
 char* hashSearch(HashTable* table, char* key) {
