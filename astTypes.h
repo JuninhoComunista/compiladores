@@ -25,6 +25,8 @@
 #define AST_EQ              24
 #define AST_DIF             25
 #define AST_NOT             26
+#define AST_VEC_ACESS       27
+#define AST_FUNC_CALL       28
 #define AST_CHAR            50
 #define AST_INT             51
 #define AST_FLOAT           52

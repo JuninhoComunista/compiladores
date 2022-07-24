@@ -51,6 +51,8 @@ void astPrint(Ast *node, int level) {
         case AST_EQ: fprintf(stderr, "AST_EQ\n"); break;
         case AST_DIF: fprintf(stderr, "AST_DIF\n"); break;
         case AST_NOT: fprintf(stderr, "AST_NOT\n"); break;
+        case AST_VEC_ACESS: fprintf(stderr, "AST_VEC_ACESS\n"); break;
+        case AST_FUNC_CALL: fprintf(stderr, "AST_FUNC_CALL\n"); break;
         case AST_CHAR: fprintf(stderr, "AST_CHAR\n"); break;
         case AST_INT: fprintf(stderr, "AST_INT\n"); break;
         case AST_FLOAT: fprintf(stderr, "AST_FLOAT\n"); break;

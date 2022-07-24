@@ -131,10 +131,10 @@ expressionList:
     ;
 
 expression:
-    identifier                              {$$ = astCreate(AST_IDENTIER, 0, $1, 0, 0, 0);}
-    | identifier '[' expression ']'         
+    identifier                              
+    | identifier '[' expression ']'         {$$ = astCreate(AST_VEC_ACESS, 0, $1, $3, 0, 0);}
     | functionCall                          
-    | literal                               {$$ = astCreate(AST_LITERAL, 0, $1, 0, 0, 0);}
+    | literal                               
     | '(' expression ')'                    {$$ = astCreate(AST_EXPR, 0, $2, 0, 0, 0);}
     | expression '+' expression             {$$ = astCreate(AST_ADD, 0, $1, $3, 0, 0);}
     | expression '-' expression             {$$ = astCreate(AST_SUB, 0, $1, $3, 0, 0);}
@@ -190,11 +190,11 @@ type:
     ;
 
 identifier:
-    TK_IDENTIFIER   {$$ = astCreate(AST_SYMBOL, $1,0,0,0,0);}
+    TK_IDENTIFIER   {$$ = astCreate(AST_IDENTIER, $1,0,0,0,0);}
     ;
 
 functionCall:
-    identifier '(' expressionList ')'
+    identifier '(' expressionList ')'   {$$ = astCreate(AST_FUNC_CALL, 0, $1, $3, 0, 0);}
     ;
 
 literalList:
@@ -203,9 +203,9 @@ literalList:
     ;
 
 literal:
-    LIT_CHAR        {$$ = astCreate(AST_SYMBOL, $1, 0,0,0,0);}
-    | LIT_INTEGER   {$$ = astCreate(AST_SYMBOL, $1, 0,0,0,0);}
-    | LIT_FLOAT     {$$ = astCreate(AST_SYMBOL, $1, 0,0,0,0);}
+    LIT_CHAR        {$$ = astCreate(AST_LITERAL, $1, 0,0,0,0);}
+    | LIT_INTEGER   {$$ = astCreate(AST_LITERAL, $1, 0,0,0,0);}
+    | LIT_FLOAT     {$$ = astCreate(AST_LITERAL, $1, 0,0,0,0);}
     ;
 
 %%
