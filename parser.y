@@ -126,8 +126,8 @@ command:
     ;
 
 expressionList:
-    expression expressionList
-    |
+    expression expressionList   {$$ = astCreate(AST_EXPR, 0, $1, $2, 0, 0);}
+    |                           {$$ = 0;}
     ;
 
 expression:
@@ -135,20 +135,20 @@ expression:
     | identifier '[' expression ']'         
     | functionCall                          
     | literal                               {$$ = astCreate(AST_LITERAL, 0, $1, 0, 0, 0);}
-    | '(' expression ')'                    
-    | expression '+' expression             
-    | expression '-' expression             
-    | expression '.' expression             
-    | expression '/' expression             
-    | expression '<' expression             
-    | expression '>' expression             
-    | expression '|' expression             
-    | expression '&' expression             
-    | expression OPERATOR_LE expression     
-    | expression OPERATOR_GE expression     
-    | expression OPERATOR_EQ expression     
-    | expression OPERATOR_DIF expression    
-    | expression '~' expression             
+    | '(' expression ')'                    {$$ = astCreate(AST_EXPR, 0, $2, 0, 0, 0);}
+    | expression '+' expression             {$$ = astCreate(AST_ADD, 0, $1, $3, 0, 0);}
+    | expression '-' expression             {$$ = astCreate(AST_SUB, 0, $1, $3, 0, 0);}
+    | expression '.' expression             {$$ = astCreate(AST_MUL, 0, $1, $3, 0, 0);}
+    | expression '/' expression             {$$ = astCreate(AST_DIV, 0, $1, $3, 0, 0);}
+    | expression '<' expression             {$$ = astCreate(AST_LES, 0, $1, $3, 0, 0);}
+    | expression '>' expression             {$$ = astCreate(AST_GRE, 0, $1, $3, 0, 0);}
+    | expression '|' expression             {$$ = astCreate(AST_OR, 0, $1, $3, 0, 0);}
+    | expression '&' expression             {$$ = astCreate(AST_AND, 0, $1, $3, 0, 0);}
+    | expression OPERATOR_LE expression     {$$ = astCreate(AST_LE, 0, $1, $3, 0, 0);}
+    | expression OPERATOR_GE expression     {$$ = astCreate(AST_GE, 0, $1, $3, 0, 0);}
+    | expression OPERATOR_EQ expression     {$$ = astCreate(AST_EQ, 0, $1, $3, 0, 0);}
+    | expression OPERATOR_DIF expression    {$$ = astCreate(AST_DIF, 0, $1, $3, 0, 0);}
+    | '~' expression                        {$$ = astCreate(AST_NOT, 0, $2, 0, 0, 0);}
     ;
 
 read:
