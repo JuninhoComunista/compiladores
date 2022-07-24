@@ -9,6 +9,7 @@ void initMe();
 extern char* yytext;
 extern int lineCount;
 extern FILE* yyin;
+extern Ast* tree;
 extern HashTable* identifiersTable;
 int isRunning(void);
 
@@ -28,9 +29,12 @@ int main(int argc, char** argv) {
 
     yyparse();
 
+    printf("\nPrinting tree\n\n");
+    astPrint(tree, 0);
+
     // printTable(identifiersTable);
 
     // printf("table numElements: %d\n", identifiersTable->numElements);
     
-    return 0;
+    exit(0);
 }

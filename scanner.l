@@ -10,10 +10,8 @@
     int lineCount = 1;
     int running = 1;
     HashTable* identifiersTable;
-
     int isRunning();
     int getLineNumber();
-
     void initMe();
 
 %}
@@ -47,12 +45,30 @@
 (==)                {return OPERATOR_EQ;}
 (!=)                {return OPERATOR_DIF;}
 
-[a-z_A-Z]*          {hashInsert(identifiersTable, yytext, yytext, SYMBOL_IDENTIFIER); return TK_IDENTIFIER;}
+[a-z_A-Z]*          {
+                        yylval.symbol = hashInsert(identifiersTable, yytext, yytext, SYMBOL_IDENTIFIER); 
+                        return TK_IDENTIFIER;
+                    }
 
-[0-9]+              {hashInsert(identifiersTable, yytext, yytext, SYMBOL_INT); return LIT_INTEGER;}
-[0-9]+,[0-9]+       {hashInsert(identifiersTable, yytext, yytext, SYMBOL_FLOAT); return LIT_FLOAT;}
-\'.\'               {hashInsert(identifiersTable, yytext, yytext, SYMBOL_CHAR); return LIT_CHAR;}
-\"(\\.|[^"\\])*\"   {hashInsert(identifiersTable, yytext, yytext, SYMBOL_STRING); return LIT_STRING;}
+[0-9]+              {
+                        yylval.symbol = hashInsert(identifiersTable, yytext, yytext, SYMBOL_INT); 
+                        return LIT_INTEGER;
+                    }
+
+[0-9]+,[0-9]+       {
+                        yylval.symbol = hashInsert(identifiersTable, yytext, yytext, SYMBOL_FLOAT); 
+                        return LIT_FLOAT;
+                    }
+
+\'.\'               {
+                        yylval.symbol = hashInsert(identifiersTable, yytext, yytext, SYMBOL_CHAR); 
+                        return LIT_CHAR;
+                    }
+                    
+\"(\\.|[^"\\])*\"   {
+                        yylval.symbol = hashInsert(identifiersTable, yytext, yytext, SYMBOL_STRING); 
+                        return LIT_STRING;
+                    }
 
 [ \t]*              {}
 \n                  {lineCount++;}
@@ -77,7 +93,5 @@ void initMe() {
 
 int yywrap() {
     running = 0;
-    // printTable(identifiersTable);
-    printf("Total number of lines: %d\n", getLineNumber());
     return 1;
 }

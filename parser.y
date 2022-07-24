@@ -3,15 +3,18 @@
     #include <stdio.h>
     #include <stdlib.h>
     #include "ast.h"
+    #include "astTypes.h"
     int yyerror();
     int yylex();
     extern int getLineNumber();
+    Ast *tree;
 %}
 
 %union {
     HashNode *symbol;
     Ast *ast;
 }
+
 %start program
 
 %token KW_CHAR      
@@ -31,14 +34,38 @@
 %token OPERATOR_EQ  
 %token OPERATOR_DIF 
 
-%token TK_IDENTIFIER
+%token<symbol> TK_IDENTIFIER
 
-%token LIT_INTEGER  
-%token LIT_FLOAT    
-%token LIT_CHAR     
-%token LIT_STRING   
+%token<symbol> LIT_INTEGER  
+%token<symbol> LIT_FLOAT    
+%token<symbol> LIT_CHAR     
+%token<symbol> LIT_STRING   
 
 %token TOKEN_ERROR
+
+%type<ast> program
+%type<ast> declarationList
+%type<ast> variableDeclaration
+%type<ast> functionDeclaration
+%type<ast> parameterList
+%type<ast> parameter
+%type<ast> block
+%type<ast> commandList
+%type<ast> command
+%type<ast> expressionList
+%type<ast> expression
+%type<ast> read
+%type<ast> printList
+%type<ast> print
+%type<ast> return
+%type<ast> while
+%type<ast> if
+%type<ast> ifElse
+%type<ast> type
+%type<ast> identifier
+%type<ast> functionCall
+%type<ast> literalList
+%type<ast> literal
 
 %left '<' '>' OPERATOR_DIF OPERATOR_EQ OPERATOR_GE OPERATOR_LE
 %right '~'
@@ -50,45 +77,45 @@
 %%
 
 program:
-    declarationList
+    declarationList     {$$ = $1; tree = $$;}
     ;
 
 declarationList:
-    variableDeclaration declarationList
-    | functionDeclaration declarationList
-    |
+    variableDeclaration declarationList     {$$ = astCreate(AST_DEC, 0, $1, $2, 0, 0);}
+    | functionDeclaration declarationList   {$$ = astCreate(AST_DEC, 0, $1, $2, 0, 0);}
+    |                                       {$$ = 0;}
     ;
 
 variableDeclaration:
-    type identifier '(' literal ')' ';'
-    | type identifier '[' LIT_INTEGER ']' literalList ';'
+    type identifier '(' literal ')' ';'                     {$$ = astCreate(AST_VAR_DEC, 0, $1, $2, $4, 0);}
+    | type identifier '[' LIT_INTEGER ']' literalList ';'   {$$ = astCreate(AST_VEC_DEC, $4, $1, $2, $6, 0);} 
     ;
 
 functionDeclaration:
-    type identifier '(' parameterList ')' block
+    type identifier '(' parameterList ')' block {$$ = astCreate(AST_FUNC_DEC, 0, $1, $2, $4, $6);}
     ;
 
 parameterList:
-    parameter parameterList
-    |
+    parameter parameterList {$$ = astCreate(AST_PARAM_LIST, 0, $1, $2, 0, 0);}
+    |                       {$$ = 0;}
     ;
 
 parameter: 
-    type identifier
+    type identifier {$$ = astCreate(AST_PARAM, 0, $1, $2, 0, 0);}
     ;
 
 block:
-    '{' commandList '}'
+    '{' commandList '}' {$$ = astCreate(AST_BLOCK, 0, $2, 0, 0, 0);}
     ;
 
 commandList:
-    command ';' commandList
-    | command
+    command ';' commandList {$$ = astCreate(AST_COMMAND, 0, $1, $3, 0, 0);}
+    |                       {$$ = 0;}
     ;
 
 command:
-    identifier ASSIGNMENT expression
-    | identifier '[' expression ']' ASSIGNMENT expression
+    identifier ASSIGNMENT expression                        {$$ = astCreate(AST_ASSIGNMENT, 0, $1, $3, 0, 0);}
+    | identifier '[' expression ']' ASSIGNMENT expression   {$$ = astCreate(AST_VEC_ASSIGNMENT, 0, $1, $3, $6, 0);}
     | read
     | print
     | return
@@ -96,7 +123,6 @@ command:
     | while
     | if
     | ifElse
-    |
     ;
 
 expressionList:
@@ -105,24 +131,24 @@ expressionList:
     ;
 
 expression:
-    identifier
-    | identifier '[' expression ']'
-    | functionCall
-    | literal
-    | '(' expression ')'
-    | expression '+' expression
-    | expression '-' expression
-    | expression '.' expression
-    | expression '/' expression
-    | expression '<' expression
-    | expression '>' expression
-    | expression '|' expression
-    | expression '&' expression
-    | expression OPERATOR_LE expression
-    | expression OPERATOR_GE expression
-    | expression OPERATOR_EQ expression
-    | expression OPERATOR_DIF expression
-    | expression '~' expression
+    identifier                              {$$ = astCreate(AST_IDENTIER, 0, $1, 0, 0, 0);}
+    | identifier '[' expression ']'         
+    | functionCall                          
+    | literal                               {$$ = astCreate(AST_LITERAL, 0, $1, 0, 0, 0);}
+    | '(' expression ')'                    
+    | expression '+' expression             
+    | expression '-' expression             
+    | expression '.' expression             
+    | expression '/' expression             
+    | expression '<' expression             
+    | expression '>' expression             
+    | expression '|' expression             
+    | expression '&' expression             
+    | expression OPERATOR_LE expression     
+    | expression OPERATOR_GE expression     
+    | expression OPERATOR_EQ expression     
+    | expression OPERATOR_DIF expression    
+    | expression '~' expression             
     ;
 
 read:
@@ -130,15 +156,15 @@ read:
     | KW_READ identifier '[' expression ']'
     ;
 
-print:
-    KW_PRINT printList
-    ;
-
 printList:
     expression printList
     | expression
     | LIT_STRING printList 
     | LIT_STRING
+    ;
+
+print:
+    KW_PRINT printList
     ;
 
 return:
@@ -158,13 +184,13 @@ ifElse:
     ;
 
 type:
-    KW_CHAR
-    | KW_INT
-    | KW_FLOAT
+    KW_CHAR     {$$ = astCreate(AST_CHAR, 0,0,0,0,0);}
+    | KW_INT    {$$ = astCreate(AST_INT, 0,0,0,0,0);}
+    | KW_FLOAT  {$$ = astCreate(AST_FLOAT, 0,0,0,0,0);}
     ;
 
 identifier:
-    TK_IDENTIFIER
+    TK_IDENTIFIER   {$$ = astCreate(AST_SYMBOL, $1,0,0,0,0);}
     ;
 
 functionCall:
@@ -172,14 +198,14 @@ functionCall:
     ;
 
 literalList:
-    literal literalList
-    |
+    literal literalList {$$ = astCreate(AST_LITERAL_LIST, 0, $1, $2, 0, 0);}
+    |                   {$$ = 0;}
     ;
 
 literal:
-    LIT_CHAR
-    | LIT_INTEGER
-    | LIT_FLOAT
+    LIT_CHAR        {$$ = astCreate(AST_SYMBOL, $1, 0,0,0,0);}
+    | LIT_INTEGER   {$$ = astCreate(AST_SYMBOL, $1, 0,0,0,0);}
+    | LIT_FLOAT     {$$ = astCreate(AST_SYMBOL, $1, 0,0,0,0);}
     ;
 
 %%
