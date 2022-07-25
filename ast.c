@@ -16,59 +16,68 @@ Ast *astCreate(int type, HashNode *symbol, Ast *son0, Ast *son1, Ast *son2, Ast 
     return newNode;
 }
 
-void astPrint(Ast *node, int level) {
+void astPrint(Ast *node, int level, FILE *output) {
     if (!node)
         return;
     int i;
 
     for (i=0; i<level; i++)
-        fprintf(stderr, "--");
+        fprintf(output, "--");
 
     switch(node->type){
-        case AST_DEC: fprintf(stderr, "AST_DEC\n"); break;
-        case AST_VAR_DEC: fprintf(stderr, "AST_VAR_DEC\n"); break;
-        case AST_FUNC_DEC: fprintf(stderr, "AST_FUNC_DEC\n"); break;
-        case AST_VEC_DEC: fprintf(stderr, "AST_VEC_DEC\n"); break;
-        case AST_PARAM_LIST: fprintf(stderr, "AST_PARAM_LIST\n"); break;
-        case AST_PARAM: fprintf(stderr, "AST_PARAM\n"); break;
-        case AST_BLOCK: fprintf(stderr, "AST_BLOCK\n"); break;
-        case AST_COMMAND: fprintf(stderr, "AST_COMMAND\n"); break;
-        case AST_ASSIGNMENT: fprintf(stderr, "AST_ASSIGNMENT\n"); break;
-        case AST_VEC_ASSIGNMENT: fprintf(stderr, "AST_VEC_ASSIGNMENT\n"); break;
-        case AST_IDENTIER: fprintf(stderr, "AST_IDENTIER\n"); break;
-        case AST_LITERAL: fprintf(stderr, "AST_LITERAL\n"); break;
-        case AST_EXPR: fprintf(stderr, "AST_EXPR\n"); break;
-        case AST_ADD: fprintf(stderr, "AST_ADD\n"); break;
-        case AST_SUB: fprintf(stderr, "AST_SUB\n"); break;
-        case AST_MUL: fprintf(stderr, "AST_MUL\n"); break;
-        case AST_DIV: fprintf(stderr, "AST_DIV\n"); break;
-        case AST_LES: fprintf(stderr, "AST_LES\n"); break;
-        case AST_GRE: fprintf(stderr, "AST_GRE\n"); break;
-        case AST_OR: fprintf(stderr, "AST_OR\n"); break;
-        case AST_AND: fprintf(stderr, "AST_AND\n"); break;
-        case AST_LE: fprintf(stderr, "AST_LE\n"); break;
-        case AST_GE: fprintf(stderr, "AST_GE\n"); break;
-        case AST_EQ: fprintf(stderr, "AST_EQ\n"); break;
-        case AST_DIF: fprintf(stderr, "AST_DIF\n"); break;
-        case AST_NOT: fprintf(stderr, "AST_NOT\n"); break;
-        case AST_VEC_ACESS: fprintf(stderr, "AST_VEC_ACESS\n"); break;
-        case AST_FUNC_CALL: fprintf(stderr, "AST_FUNC_CALL\n"); break;
-        case AST_CHAR: fprintf(stderr, "AST_CHAR\n"); break;
-        case AST_INT: fprintf(stderr, "AST_INT\n"); break;
-        case AST_FLOAT: fprintf(stderr, "AST_FLOAT\n"); break;
-        case AST_SYMBOL: fprintf(stderr, "AST_SYMBOL\n"); break;
-        case AST_LITERAL_LIST: fprintf(stderr, "AST_LITERAL_LIST\n"); break;
-        default: fprintf(stderr, "AST_UNKNOWN\n"); break;
+        case AST_DEC: fprintf(output, "AST_DEC\n"); break;
+        case AST_VAR_DEC: fprintf(output, "AST_VAR_DEC\n"); break;
+        case AST_FUNC_DEC: fprintf(output, "AST_FUNC_DEC\n"); break;
+        case AST_VEC_DEC: fprintf(output, "AST_VEC_DEC\n"); break;
+        case AST_PARAM_LIST: fprintf(output, "AST_PARAM_LIST\n"); break;
+        case AST_PARAM: fprintf(output, "AST_PARAM\n"); break;
+        case AST_BLOCK: fprintf(output, "AST_BLOCK\n"); break;
+        case AST_COMMAND: fprintf(output, "AST_COMMAND\n"); break;
+        case AST_ASSIGNMENT: fprintf(output, "AST_ASSIGNMENT\n"); break;
+        case AST_VEC_ASSIGNMENT: fprintf(output, "AST_VEC_ASSIGNMENT\n"); break;
+        case AST_IDENTIER: fprintf(output, "AST_IDENTIER\n"); break;
+        case AST_LITERAL: fprintf(output, "AST_LITERAL\n"); break;
+        case AST_EXPR: fprintf(output, "AST_EXPR\n"); break;
+        case AST_ADD: fprintf(output, "AST_ADD\n"); break;
+        case AST_SUB: fprintf(output, "AST_SUB\n"); break;
+        case AST_MUL: fprintf(output, "AST_MUL\n"); break;
+        case AST_DIV: fprintf(output, "AST_DIV\n"); break;
+        case AST_LES: fprintf(output, "AST_LES\n"); break;
+        case AST_GRE: fprintf(output, "AST_GRE\n"); break;
+        case AST_OR: fprintf(output, "AST_OR\n"); break;
+        case AST_AND: fprintf(output, "AST_AND\n"); break;
+        case AST_LE: fprintf(output, "AST_LE\n"); break;
+        case AST_GE: fprintf(output, "AST_GE\n"); break;
+        case AST_EQ: fprintf(output, "AST_EQ\n"); break;
+        case AST_DIF: fprintf(output, "AST_DIF\n"); break;
+        case AST_NOT: fprintf(output, "AST_NOT\n"); break;
+        case AST_VEC_ACESS: fprintf(output, "AST_VEC_ACESS\n"); break;
+        case AST_FUNC_CALL: fprintf(output, "AST_FUNC_CALL\n"); break;
+        case AST_READ: fprintf(output, "AST_READ\n"); break;
+        case AST_PRINT: fprintf(output, "AST_PRINT\n"); break;
+        case AST_STRING: fprintf(output, "AST_STRING\n"); break;
+        case AST_PARENTHESIS: fprintf(output, "AST_PARENTHESIS\n"); break;
+        case AST_VEC_READ: fprintf(output, "AST_VEC_READ\n"); break;
+        case AST_RETURN: fprintf(output, "AST_RETURN\n"); break;
+        case AST_WHILE: fprintf(output, "AST_WHILE\n"); break;
+        case AST_IF: fprintf(output, "AST_IF\n"); break;
+        case AST_IF_ELSE: fprintf(output, "AST_IF_ELSE\n"); break;
+        case AST_CHAR: fprintf(output, "AST_CHAR\n"); break;
+        case AST_INT: fprintf(output, "AST_INT\n"); break;
+        case AST_FLOAT: fprintf(output, "AST_FLOAT\n"); break;
+        case AST_SYMBOL: fprintf(output, "AST_SYMBOL\n"); break;
+        case AST_LITERAL_LIST: fprintf(output, "AST_LITERAL_LIST\n"); break;
+        default: fprintf(output, "AST_UNKNOWN\n"); break;
     }
 
     if (node->symbol) {
         for (i=0; i<level; i++)
-            fprintf(stderr, "--");
-        fprintf(stderr, "symbol= %s\n", node->symbol->value);
+            fprintf(output, "--");
+        fprintf(output, "symbol= %s\n", node->symbol->value);
     }
 
     for (i=0; i<MAX_SONS; i++){
-        astPrint(node->son[i], level+1);
+        astPrint(node->son[i], level+1, output);
     }
 
 }

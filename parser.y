@@ -110,6 +110,7 @@ block:
 
 commandList:
     command ';' commandList {$$ = astCreate(AST_COMMAND, 0, $1, $3, 0, 0);}
+    | command               {$$ = astCreate(AST_COMMAND, 0, $1, 0, 0, 0);}
     |                       {$$ = 0;}
     ;
 
@@ -135,7 +136,7 @@ expression:
     | identifier '[' expression ']'         {$$ = astCreate(AST_VEC_ACESS, 0, $1, $3, 0, 0);}
     | functionCall                          
     | literal                               
-    | '(' expression ')'                    {$$ = astCreate(AST_EXPR, 0, $2, 0, 0, 0);}
+    | '(' expression ')'                    {$$ = astCreate(AST_PARENTHESIS, 0, $2, 0, 0, 0);}
     | expression '+' expression             {$$ = astCreate(AST_ADD, 0, $1, $3, 0, 0);}
     | expression '-' expression             {$$ = astCreate(AST_SUB, 0, $1, $3, 0, 0);}
     | expression '.' expression             {$$ = astCreate(AST_MUL, 0, $1, $3, 0, 0);}
@@ -152,35 +153,35 @@ expression:
     ;
 
 read:
-    KW_READ identifier
-    | KW_READ identifier '[' expression ']'
+    KW_READ identifier                      {$$ = astCreate(AST_READ, 0, $2, 0, 0, 0);}
+    | KW_READ identifier '[' expression ']' {$$ = astCreate(AST_VEC_READ, 0, $2, $4, 0, 0);}
     ;
 
 printList:
-    expression printList
-    | expression
-    | LIT_STRING printList 
-    | LIT_STRING
+    expression printList    {$$ = astCreate(AST_EXPR, 0, $1, $2, 0, 0);}
+    | expression            {$$ = astCreate(AST_EXPR, 0, $1, 0, 0, 0);}
+    | LIT_STRING printList  {$$ = astCreate(AST_STRING, $1, $2, 0, 0, 0);}
+    | LIT_STRING            {$$ = astCreate(AST_STRING, $1, 0, 0, 0, 0);}
     ;
 
 print:
-    KW_PRINT printList
+    KW_PRINT printList  {$$ = astCreate(AST_PRINT, 0, $2, 0, 0, 0);}
     ;
 
 return:
-    KW_RETURN expression
+    KW_RETURN expression {$$ = astCreate(AST_RETURN, 0, $2, 0, 0, 0);}
     ;
 
 while:
-    KW_WHILE '(' expression ')' command
+    KW_WHILE '(' expression ')' command {$$ = astCreate(AST_WHILE, 0, $3, $5, 0, 0);}
     ;
 
 if:
-    KW_IF '(' expression ')' command
+    KW_IF '(' expression ')' command    {$$ = astCreate(AST_IF, 0, $3, $5, 0, 0);}
     ;
 
 ifElse:
-    KW_IF '(' expression ')' command KW_ELSE command
+    KW_IF '(' expression ')' command KW_ELSE command    {$$ = astCreate(AST_IF_ELSE, 0, $3, $5, $7, 0);}
     ;
 
 type:
