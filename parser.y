@@ -117,7 +117,7 @@ expression:
     | expression OPERATOR_GE expression
     | expression OPERATOR_EQ expression
     | expression OPERATOR_DIF expression
-    | expression '~' expression
+    | '~' expression
     ;
 
 read:

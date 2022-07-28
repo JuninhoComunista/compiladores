@@ -1,10 +1,10 @@
 lex.yy.*
-etapa1
+etapa*
 config.txt
 .vscode/
 in.txt
+output.txt
 test.txt
-etapa1.tgz
 sample.txt
 *.o
 *.d

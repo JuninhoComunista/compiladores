@@ -31,5 +31,5 @@ int main(int argc, char** argv) {
 
     // printf("table numElements: %d\n", identifiersTable->numElements);
     
-    return 0;
+    exit(0);
 }
