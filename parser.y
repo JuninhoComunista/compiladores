@@ -4,10 +4,10 @@
     #include <stdlib.h>
     #include "ast.h"
     #include "astTypes.h"
+    #include "decompiler.h"
     int yyerror();
     int yylex();
     extern int getLineNumber();
-    Ast *tree;
 %}
 
 %union {
@@ -77,7 +77,20 @@
 %%
 
 program:
-    declarationList     {$$ = $1; tree = $$;}
+    declarationList     {
+                            $$ = $1;
+                            FILE *output, *treeFile;
+                            if ((treeFile = fopen("tree.txt", "w")) == 0) {
+                                printf("Cannot open tree.txt\n");
+                            }
+                            printf("\nPrinting tree\n\n");
+                            astPrint($$, 0, treeFile);
+                            if ((output = fopen("output.txt", "w")) == 0) {
+                                printf("Cannot open file output.txt... \n");
+                                exit(4);
+                            }
+                            decompile($$, output);
+                        }
     ;
 
 declarationList:

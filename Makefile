@@ -1,7 +1,9 @@
-etapa3: lex.yy.o main.o hash.o ast.o y.tab 
-	gcc -Wall -o etapa3 -g y.tab.c lex.yy.o main.o hash.o ast.o
+etapa3: lex.yy.o main.o hash.o ast.o decompiler.o y.tab
+	gcc -Wall -o etapa3 -g y.tab.c lex.yy.o main.o hash.o ast.o decompiler.o
 main.o: main.c
 	gcc -c -g main.c
+decompiler.o: decompiler.c
+	gcc -c -g decompiler.c
 ast.o: ast.c
 	gcc -c -g ast.c
 hash.o: hash.c
@@ -14,4 +16,4 @@ y.tab: parser.y
 	yacc -d parser.y
 
 clean:
-	rm lex.yy.* y.tab.* *.o etapa3 output.txt
+	rm lex.yy.* y.tab.* *.o etapa3 output.txt tree.txt

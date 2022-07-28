@@ -1,0 +1,5 @@
+Exit(0) - Sucess
+Exit(1) - Less arguments then needed
+Exit(2) - Can't open input file
+Exit(3) - Parse error
+Exit(4) - Can't open output file
