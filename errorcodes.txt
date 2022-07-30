@@ -3,3 +3,7 @@ Exit(1) - Less arguments then needed
 Exit(2) - Can't open input file
 Exit(3) - Parse error
 Exit(4) - Can't open output file
+Exit(5) - Unkwown symbol type
+Exit(6) - Unknown declaration type
+Exit(7) - Unknown command type
+Exit(8) - Unknown expression type

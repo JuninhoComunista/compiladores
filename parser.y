@@ -3,8 +3,8 @@
     #include <stdio.h>
     #include <stdlib.h>
     #include "ast.h"
-    #include "astTypes.h"
     #include "decompiler.h"
+    extern FILE *yyout;
     int yyerror();
     int yylex();
     extern int getLineNumber();
@@ -79,23 +79,19 @@
 program:
     declarationList     {
                             $$ = $1;
-                            FILE *output, *treeFile;
+                            FILE *treeFile;
                             if ((treeFile = fopen("tree.txt", "w")) == 0) {
                                 printf("Cannot open tree.txt\n");
                             }
                             printf("\nPrinting tree\n\n");
                             astPrint($$, 0, treeFile);
-                            if ((output = fopen("output.txt", "w")) == 0) {
-                                printf("Cannot open file output.txt... \n");
-                                exit(4);
-                            }
-                            decompile($$, output);
+                            decompile($$, yyout);
                         }
     ;
 
 declarationList:
-    variableDeclaration declarationList     {$$ = astCreate(AST_DEC, 0, $1, $2, 0, 0);}
-    | functionDeclaration declarationList   {$$ = astCreate(AST_DEC, 0, $1, $2, 0, 0);}
+    variableDeclaration declarationList     {$$ = astCreate(AST_DEC_LIST, 0, $1, $2, 0, 0);}
+    | functionDeclaration declarationList   {$$ = astCreate(AST_DEC_LIST, 0, $1, $2, 0, 0);}
     |                                       {$$ = 0;}
     ;
 
@@ -122,8 +118,8 @@ block:
     ;
 
 commandList:
-    command ';' commandList {$$ = astCreate(AST_COMMAND, 0, $1, $3, 0, 0);}
-    | command               {$$ = astCreate(AST_COMMAND, 0, $1, 0, 0, 0);}
+    command ';' commandList {$$ = astCreate(AST_COMMAND_LIST, 0, $1, $3, 0, 0);}
+    | command               {$$ = astCreate(AST_COMMAND_LIST, 0, $1, 0, 0, 0);}
     |                       {$$ = 0;}
     ;
 
@@ -140,7 +136,7 @@ command:
     ;
 
 expressionList:
-    expression expressionList   {$$ = astCreate(AST_EXPR, 0, $1, $2, 0, 0);}
+    expression expressionList   {$$ = astCreate(AST_EXPR_LIST, 0, $1, $2, 0, 0);}
     |                           {$$ = 0;}
     ;
 
@@ -204,7 +200,7 @@ type:
     ;
 
 identifier:
-    TK_IDENTIFIER   {$$ = astCreate(AST_IDENTIER, $1,0,0,0,0);}
+    TK_IDENTIFIER   {$$ = astCreate(AST_IDENTIFIER, $1,0,0,0,0);}
     ;
 
 functionCall:
