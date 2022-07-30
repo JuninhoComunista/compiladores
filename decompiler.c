@@ -2,6 +2,13 @@
 
 #include "decompiler.h"
 
-void decompile(Ast *program, FILE *output) {
+void mainSwitch(Ast *node, FILE *output) {
     
+}
+
+void decompile(Ast *program, FILE *output) {
+    if (!program || !output)
+        return;
+
+    mainSwitch(program, output);
 }

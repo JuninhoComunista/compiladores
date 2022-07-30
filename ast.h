@@ -14,4 +14,6 @@ typedef struct AstNode {
 
 Ast *astCreate(int type, HashNode *symbol, Ast *son0, Ast *son1, Ast *son2, Ast *son3);
 
+void astPrintNode(Ast *node, FILE *output);
+
 void astPrint(Ast *node, int level, FILE *output);
