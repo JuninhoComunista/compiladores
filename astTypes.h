@@ -1,17 +1,18 @@
 //Nome: Nicolas Paris - Cartao: 302650
-#define AST_DEC             1
+#pragma once
+#define AST_DEC_LIST        1
 #define AST_VAR_DEC         2
 #define AST_FUNC_DEC        3
 #define AST_VEC_DEC         4
 #define AST_PARAM_LIST      5
 #define AST_PARAM           6
 #define AST_BLOCK           7
-#define AST_COMMAND         8
+#define AST_COMMAND_LIST    8
 #define AST_ASSIGNMENT      9
 #define AST_VEC_ASSIGNMENT  10
-#define AST_IDENTIER        11
+#define AST_IDENTIFIER      11
 #define AST_LITERAL         12
-#define AST_EXPR            13
+#define AST_EXPR_LIST       13
 #define AST_ADD             14
 #define AST_SUB             15
 #define AST_MUL             16
@@ -41,3 +42,4 @@
 #define AST_FLOAT           40
 #define AST_SYMBOL          41
 #define AST_LITERAL_LIST    42
+#define AST_EXPR            43

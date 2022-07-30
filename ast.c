@@ -1,7 +1,6 @@
 // Nome: Nicolas Paris - Cartao: 302650
 
 #include "ast.h"
-#include "astTypes.h"
 
 Ast *astCreate(int type, HashNode *symbol, Ast *son0, Ast *son1, Ast *son2, Ast *son3) {
     Ast *newNode;
@@ -21,18 +20,19 @@ void printType(Ast *node, FILE *output) {
         return;
 
     switch(node->type){
-        case AST_DEC: fprintf(output, "AST_DEC"); break;
+        case AST_DEC_LIST: fprintf(output, "AST_DEC_LIST"); break;
         case AST_VAR_DEC: fprintf(output, "AST_VAR_DEC"); break;
         case AST_FUNC_DEC: fprintf(output, "AST_FUNC_DEC"); break;
         case AST_VEC_DEC: fprintf(output, "AST_VEC_DEC"); break;
         case AST_PARAM_LIST: fprintf(output, "AST_PARAM_LIST"); break;
         case AST_PARAM: fprintf(output, "AST_PARAM"); break;
         case AST_BLOCK: fprintf(output, "AST_BLOCK"); break;
-        case AST_COMMAND: fprintf(output, "AST_COMMAND"); break;
+        case AST_COMMAND_LIST: fprintf(output, "AST_COMMAND_LIST"); break;
         case AST_ASSIGNMENT: fprintf(output, "AST_ASSIGNMENT"); break;
         case AST_VEC_ASSIGNMENT: fprintf(output, "AST_VEC_ASSIGNMENT"); break;
-        case AST_IDENTIER: fprintf(output, "AST_IDENTIER"); break;
+        case AST_IDENTIFIER: fprintf(output, "AST_IDENTIFIER"); break;
         case AST_LITERAL: fprintf(output, "AST_LITERAL"); break;
+        case AST_EXPR_LIST: fprintf(output, "AST_EXPR_LIST"); break;
         case AST_EXPR: fprintf(output, "AST_EXPR"); break;
         case AST_ADD: fprintf(output, "AST_ADD"); break;
         case AST_SUB: fprintf(output, "AST_SUB"); break;

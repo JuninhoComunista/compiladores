@@ -3,6 +3,7 @@
 #pragma once
 
 #include "hash.h"
+#include "astTypes.h"
 
 #define MAX_SONS 4
 
