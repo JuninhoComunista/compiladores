@@ -6,6 +6,8 @@ int level = 0;
 
 void decompileBlock(Ast *node, FILE *output);
 
+void decompileExpression(Ast *node, FILE *output);
+
 char *typeToString(int type) {
     switch (type)
     {
@@ -35,6 +37,12 @@ void decompileVecDec(Ast *node, FILE *output) {
         }
     } 
     fprintf(output, ";\n");
+}
+
+void decompileTuple(Ast *node, FILE *output, char *operator) {
+    decompileExpression(node->son[0], output);
+    fprintf(output, "%s", operator);
+    decompileExpression(node->son[1], output);
 }
 
 void decompileExpression(Ast *node, FILE *output) {
@@ -73,55 +81,56 @@ void decompileExpression(Ast *node, FILE *output) {
         }
         break;
         case AST_ADD: {
-
+            decompileTuple(node, output, "+");
         }
         break;
         case AST_SUB: {
-
+            decompileTuple(node, output, "-");
         }
         break;
         case AST_MUL: {
-
+            decompileTuple(node, output, ".");
         }
         break;
         case AST_DIV: {
-
+            decompileTuple(node, output, "/");
         }
         break;
         case AST_LES: {
-
+            decompileTuple(node, output, "<");
         }
         break;
         case AST_GRE: {
-
+            decompileTuple(node, output, ">");
         }
         break;
         case AST_OR: {
-
+            decompileTuple(node, output, "|");
         }
         break;
         case AST_AND: {
-
+            decompileTuple(node, output, "&");
         }
         break;
         case AST_LE: {
-
+            decompileTuple(node, output, "<=");
         }
         break;
         case AST_GE: {
-
+            decompileTuple(node, output, ">=");
         }
         break;
         case AST_EQ: {
-
+            decompileTuple(node, output, "==");
         }
         break;
         case AST_DIF: {
-
+            decompileTuple(node, output, "!=");
         }
         break;
         case AST_NOT: {
-
+            fprintf(output, "~");
+            decompileExpression(node->son[0], output);
         }
         break;
         default:
