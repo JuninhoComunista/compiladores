@@ -3,6 +3,7 @@
 #include "decompiler.h"
 
 int level = 0;
+int flowControl = 0;
 
 void decompileBlock(Ast *node, FILE *output);
 
@@ -138,38 +139,100 @@ void decompileExpression(Ast *node, FILE *output) {
     }
 }
 
+void decompilePrint(Ast *node, FILE *output) {
+    if (node->type == AST_EXPR) {
+        fprintf(output, " ");
+        decompileExpression(node->son[0], output);
+        if (node->son[1]) {
+            decompilePrint(node->son[1], output);
+        }
+    } else {
+        fprintf(output, " %s", node->symbol->value);
+        if (node->son[0]) {
+            decompilePrint(node->son[0], output);
+        }
+    }
+}
+
 void decompileCmd(Ast *node, FILE *output) {
     if(!node)
         return;
 
-    for(int i = 0; i < level; i++)
+    if(!flowControl) {
+        for(int i = 0; i < level; i++)
                 fprintf(output, "\t");
+    }
 
     switch(node->type) {
         case AST_ASSIGNMENT: {
+            flowControl = 0;
             fprintf(output, "%s <- ", node->son[0]->symbol->value);        //Identifier
             decompileExpression(node->son[1], output);
         }
         break;
-        case AST_VEC_ASSIGNMENT:
+        case AST_VEC_ASSIGNMENT: {
+            flowControl = 0;
+            fprintf(output, "%s", node->son[0]->symbol->value); //Identifier
+            fprintf(output, "[");
+            decompileExpression(node->son[1], output);
+            fprintf(output, "] <- ");
+            decompileExpression(node->son[2], output);
+        }
         break;
-        case AST_READ:
+        case AST_READ: {
+            flowControl = 0;
+            fprintf(output,"read %s", node->son[0]->symbol->value);
+        }
         break;
-        case AST_VEC_READ:
+        case AST_VEC_READ: {
+            flowControl = 0;
+            fprintf(output, "read %s[", node->son[0]->symbol->value);
+            decompileExpression(node->son[1], output);
+            fprintf(output, "]");
+        }
         break;
-        case AST_PRINT:
+        case AST_PRINT:{
+            flowControl = 0;
+            fprintf(output, "print");
+            decompilePrint(node->son[0], output);
+        }
         break;
-        case AST_RETURN:
+        case AST_RETURN: {
+            flowControl = 0;
+            fprintf(output, "return ");
+            decompileExpression(node->son[0], output);
+        }
         break;
         case AST_BLOCK: {
+            flowControl = 0;
             decompileBlock(node, output);
         }
         break;
-        case AST_WHILE:
+        case AST_WHILE: {
+            flowControl = 1;
+            fprintf(output, "while (");
+            decompileExpression(node->son[0], output);
+            fprintf(output,") ");
+            decompileCmd(node->son[1], output);
+        }
         break;
-        case AST_IF:
+        case AST_IF: {
+            flowControl = 1;
+            fprintf(output, "if (");
+            decompileExpression(node->son[0], output);
+            fprintf(output,") ");
+            decompileCmd(node->son[1], output);
+        }
         break;
-        case AST_IF_ELSE:
+        case AST_IF_ELSE: {
+            flowControl = 1;
+            fprintf(output, "if (");
+            decompileExpression(node->son[0], output);
+            fprintf(output,") ");
+            decompileCmd(node->son[1], output);
+            fprintf(output, " else ");
+            decompileCmd(node->son[2], output);
+        }
         break;
         default:
             fprintf(stderr, "Unknown command type"); exit(7);
@@ -193,13 +256,16 @@ void decompileBlock(Ast *node, FILE *output) {
             fprintf(output, "\t");
         fprintf(output, "}");
     } else {
-        fprintf(output, "{}");
+        fprintf(output, "{\n");
+        for(int i = 0; i < level; i++)
+            fprintf(output, "\t");
+        fprintf(output, "}");
     }
 }
 
 void decompileFuncDec(Ast *node, FILE *output) {
     //son0 - type, son1 - identifier, son2 - parameterList, son3 - block
-    fprintf(output, "%s ", typeToString(node->son[0]->type));   //Type
+    fprintf(output, "\n%s ", typeToString(node->son[0]->type));   //Type
     fprintf(output, "%s", node->son[1]->symbol->value);         //Identifier
     fprintf(output, "(");
     if (node->son[2]) {
