@@ -13,6 +13,7 @@
     int isRunning();
     int getLineNumber();
     void initMe();
+    int yyparse();
 
 %}
 

@@ -120,7 +120,6 @@ block:
 commandList:
     command ';' commandList {$$ = astCreate(AST_COMMAND_LIST, 0, $1, $3, 0, 0);}
     | command               {$$ = astCreate(AST_COMMAND_LIST, 0, $1, 0, 0, 0);}
-    |                       {$$ = 0;}
     ;
 
 command:
@@ -133,6 +132,7 @@ command:
     | while
     | if
     | ifElse
+    |                                                       {$$ = 0;}
     ;
 
 expressionList:
