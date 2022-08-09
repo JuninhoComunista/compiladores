@@ -13,7 +13,6 @@ extern HashTable* identifiersTable;
 int isRunning(void);
 
 int main(int argc, char** argv) {
-    int ntoken;
 
     if (argc < 3) {
         printf("Less arguments then needed \n");

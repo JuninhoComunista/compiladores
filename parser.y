@@ -7,6 +7,7 @@
     extern FILE *yyout;
     int yyerror();
     int yylex();
+    int yyparse();
     extern int getLineNumber();
 %}
 
