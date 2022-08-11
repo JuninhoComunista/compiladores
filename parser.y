@@ -8,7 +8,7 @@
     int yyerror();
     int yylex();
     int yyparse();
-    extern int getLineNumber();
+    int getLineNumber();
 %}
 
 %union {
