@@ -15,7 +15,7 @@ char *typeToString(int type) {
     case AST_CHAR: return "char";
     case AST_FLOAT: return "float";
     case AST_INT: return "int";
-    default: fprintf(stderr, "Unknown symbol type!\n");    exit(5);
+    default: fprintf(stderr, "Unknown symbol type!\n");    exit(11);
     }
     
 }
@@ -135,7 +135,7 @@ void decompileExpression(Ast *node, FILE *output) {
         }
         break;
         default:
-            fprintf(stderr, "Unknown expression type"); exit(8);
+            fprintf(stderr, "Unknown expression type"); exit(14);
     }
 }
 
@@ -235,7 +235,7 @@ void decompileCmd(Ast *node, FILE *output) {
         }
         break;
         default:
-            fprintf(stderr, "Unknown command type"); exit(7);
+            fprintf(stderr, "Unknown command type"); exit(13);
     }
 }
 
@@ -304,7 +304,7 @@ void decompileDecList(Ast *node, FILE *output) {
         }
         break;
         default:
-            fprintf(stderr, "Unknown declaration type\n"); exit(6);
+            fprintf(stderr, "Unknown declaration type\n"); exit(12);
     }
     
 }

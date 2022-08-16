@@ -2,8 +2,9 @@ Exit(0) - Sucess
 Exit(1) - Less arguments then needed
 Exit(2) - Can't open input file
 Exit(3) - Parse error
-Exit(4) - Can't open output file
-Exit(5) - Unkwown symbol type
-Exit(6) - Unknown declaration type
-Exit(7) - Unknown command type
-Exit(8) - Unknown expression type
+Exit(4) - Sintatic error
+Exit(10) - Can't open output file
+Exit(11) - Unkwown symbol type
+Exit(12) - Unknown declaration type
+Exit(13) - Unknown command type
+Exit(14) - Unknown expression type

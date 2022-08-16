@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
 
     if ((yyout = fopen(argv[2], "w")) == 0) {
         printf("Cannot open file %s... \n",argv[2]);
-        exit(4);
+        exit(10);
     }
 
     initMe();
