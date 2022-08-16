@@ -9,6 +9,7 @@
 
 typedef struct AstNode {
     int type;
+    int dataType;
     struct AstNode *son[MAX_SONS];
     HashNode *symbol;
 } Ast;

@@ -5,11 +5,13 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "types.h"
 
 typedef struct HashNode {
     char* key;
     char* value;
     int type;
+    int dataType;
 } HashNode;
 
 typedef struct LinkedList {

@@ -1,3 +1,3 @@
 sh clean.sh
 make
-./etapa3 test.txt output.txt
+./etapa4 test.txt output.txt
