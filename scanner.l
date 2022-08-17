@@ -2,6 +2,7 @@
     //Nome: Nicolas Paris - Cartao: 302650
     #include "hash.h"
     #include "symbolTypes.h"
+    #include "semantic.h"
     #include "ast.h"
     #include "y.tab.h"
 
@@ -14,7 +15,6 @@
     int getLineNumber();
     void initMe();
     int yyparse();
-
 %}
 
 %x COMMENT

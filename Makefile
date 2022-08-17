@@ -4,7 +4,7 @@ main.o: main.c
 	gcc -Wall -c -g main.c
 decompiler.o: decompiler.c
 	gcc -Wall -c -g decompiler.c
-semantic.0: semantic.c
+semantic.o: semantic.c
 	gcc -Wall -c -g semantic.c
 ast.o: ast.c
 	gcc -Wall -c -g ast.c

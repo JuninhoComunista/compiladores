@@ -10,11 +10,12 @@
 typedef struct AstNode {
     int type;
     int dataType;
+    int lineNumber;
     struct AstNode *son[MAX_SONS];
     HashNode *symbol;
 } Ast;
 
-Ast *astCreate(int type, HashNode *symbol, Ast *son0, Ast *son1, Ast *son2, Ast *son3);
+Ast *astCreate(int lineNumber, int type, HashNode *symbol, Ast *son0, Ast *son1, Ast *son2, Ast *son3);
 
 void astPrintNode(Ast *node, FILE *output);
 

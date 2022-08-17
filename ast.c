@@ -2,10 +2,11 @@
 
 #include "ast.h"
 
-Ast *astCreate(int type, HashNode *symbol, Ast *son0, Ast *son1, Ast *son2, Ast *son3) {
+Ast *astCreate(int lineNumber, int type, HashNode *symbol, Ast *son0, Ast *son1, Ast *son2, Ast *son3) {
     Ast *newNode;
     newNode = (Ast*) calloc(1, sizeof(Ast));
     newNode->type = type;
+    newNode->lineNumber = lineNumber;
     newNode->symbol = symbol;
     newNode->son[0] = son0;
     newNode->son[1] = son1;
