@@ -122,7 +122,11 @@ void destroyOverflowBuckets(HashTable* table) {
 }
 
 HashNode* hashInsert(HashTable* table, char* key, char* value, int type) {
-    HashNode* node = createNode(key, value, type);
+    HashNode* node = hashSearch(table, key);
+    if (node) 
+        return node;
+        
+    node = createNode(key, value, type);
     unsigned long index;
     HashNode* currentNode;
     index = hashFunction(key)%table->size;
@@ -138,14 +142,14 @@ HashNode* hashInsert(HashTable* table, char* key, char* value, int type) {
     return node;
 }
 
-char* hashSearch(HashTable* table, char* key) {
-    unsigned long index = hashFunction(key);
+HashNode* hashSearch(HashTable* table, char* key) {
+    unsigned long index = hashFunction(key)%table->size;
     HashNode* node = table->nodes[index];
     LinkedList* head = table->overflowBuckets[index];
 
     while (node != NULL) {
         if (strcmp(node->key, key) == 0) {
-            return node->value;
+            return node;
         }
         if (head == NULL) {
             return NULL;

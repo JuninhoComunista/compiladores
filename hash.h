@@ -39,6 +39,6 @@ void destroyNode(HashNode* node);
 void destroyTable(HashTable* table);
 void destroyOverflowBuckets(HashTable* table);
 HashNode* hashInsert(HashTable* table, char* key, char* value, int type);
-char* hashSearch(HashTable* table, char* key);
+HashNode* hashSearch(HashTable* table, char* key);
 void handleCollision(HashTable* table, unsigned long index, HashNode* node);
 void printTable(HashTable* table);
