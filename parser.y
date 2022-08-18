@@ -107,6 +107,7 @@ variableDeclaration:
                                                             }
     | type identifier '[' LIT_INTEGER ']' literalList ';'   {
                                                                 $$ = astCreate(getLineNumber(), AST_VEC_DEC, $4, $1, $2, $6, 0);
+                                                                $4->dataType = DT_INT;
                                                                 $2->symbol->lineNumber = getLineNumber();
                                                             } 
     ;
@@ -204,8 +205,14 @@ read:
 printList:
     expression printList    {$$ = astCreate(getLineNumber(), AST_EXPR, 0, $1, $2, 0, 0);}
     | expression            {$$ = astCreate(getLineNumber(), AST_EXPR, 0, $1, 0, 0, 0);}
-    | LIT_STRING printList  {$$ = astCreate(getLineNumber(), AST_STRING, $1, $2, 0, 0, 0);}
-    | LIT_STRING            {$$ = astCreate(getLineNumber(), AST_STRING, $1, 0, 0, 0, 0);}
+    | LIT_STRING printList  {
+                                $$ = astCreate(getLineNumber(), AST_STRING, $1, $2, 0, 0, 0);
+                                $1->dataType = DT_STRING;
+                            }
+    | LIT_STRING            {
+                                $$ = astCreate(getLineNumber(), AST_STRING, $1, 0, 0, 0, 0);
+                                $1->dataType = DT_STRING;
+                            }
     ;
 
 print:
@@ -251,9 +258,18 @@ literalList:
     ;
 
 literal:
-    LIT_CHAR        {$$ = astCreate(getLineNumber(), AST_LITERAL, $1, 0,0,0,0);}
-    | LIT_INTEGER   {$$ = astCreate(getLineNumber(), AST_LITERAL, $1, 0,0,0,0);}
-    | LIT_FLOAT     {$$ = astCreate(getLineNumber(), AST_LITERAL, $1, 0,0,0,0);}
+    LIT_CHAR        {
+                        $$ = astCreate(getLineNumber(), AST_LITERAL, $1, 0,0,0,0);
+                        $1->dataType = DT_CHAR;
+                    }
+    | LIT_INTEGER   {
+                        $$ = astCreate(getLineNumber(), AST_LITERAL, $1, 0,0,0,0);
+                        $1->dataType = DT_INT;
+                    }
+    | LIT_FLOAT     {
+                        $$ = astCreate(getLineNumber(), AST_LITERAL, $1, 0,0,0,0);
+                        $1->dataType = DT_FLOAT;
+                    }
     ;
 
 %%

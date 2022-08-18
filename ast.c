@@ -75,7 +75,11 @@ void astPrintNode(Ast *node, FILE *output) {
     printType(node, output);
 
     if (node->symbol) {
-        fprintf(output, "--->symbol= %s", node->symbol->value);
+        fprintf(output, "--->symbol= %s ", node->symbol->value);
+        
+        if (node->symbol->dataType) {
+            fprintf(output, "dataType= %d", node->symbol->dataType);
+        }
     }
 
     fprintf(output, "\n");
