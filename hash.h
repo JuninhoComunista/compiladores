@@ -12,6 +12,7 @@ typedef struct HashNode {
     char* value;
     int type;
     int dataType;
+    int lineNumber;
 } HashNode;
 
 typedef struct LinkedList {

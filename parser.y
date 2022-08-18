@@ -101,12 +101,21 @@ declarationList:
     ;
 
 variableDeclaration:
-    type identifier '(' literal ')' ';'                     {$$ = astCreate(getLineNumber(), AST_VAR_DEC, 0, $1, $2, $4, 0);}
-    | type identifier '[' LIT_INTEGER ']' literalList ';'   {$$ = astCreate(getLineNumber(), AST_VEC_DEC, $4, $1, $2, $6, 0);} 
+    type identifier '(' literal ')' ';'                     {
+                                                                $$ = astCreate(getLineNumber(), AST_VAR_DEC, 0, $1, $2, $4, 0);
+                                                                $2->symbol->lineNumber = getLineNumber();
+                                                            }
+    | type identifier '[' LIT_INTEGER ']' literalList ';'   {
+                                                                $$ = astCreate(getLineNumber(), AST_VEC_DEC, $4, $1, $2, $6, 0);
+                                                                $2->symbol->lineNumber = getLineNumber();
+                                                            } 
     ;
 
 functionDeclaration:
-    type identifier '(' parameterList ')' block {$$ = astCreate(getLineNumber(), AST_FUNC_DEC, 0, $1, $2, $4, $6);}
+    type identifier '(' parameterList ')' block {
+                                                    $$ = astCreate(getLineNumber(), AST_FUNC_DEC, 0, $1, $2, $4, $6);
+                                                    $2->symbol->lineNumber = getLineNumber();
+                                                }
     ;
 
 parameterList:
@@ -115,7 +124,10 @@ parameterList:
     ;
 
 parameter: 
-    type identifier {$$ = astCreate(getLineNumber(), AST_PARAM, 0, $1, $2, 0, 0);}
+    type identifier {
+                        $$ = astCreate(getLineNumber(), AST_PARAM, 0, $1, $2, 0, 0);
+                        $2->symbol->lineNumber = getLineNumber();
+                    }
     ;
 
 block:
@@ -128,8 +140,14 @@ commandList:
     ;
 
 command:
-    identifier ASSIGNMENT expression                        {$$ = astCreate(getLineNumber(), AST_ASSIGNMENT, 0, $1, $3, 0, 0);}
-    | identifier '[' expression ']' ASSIGNMENT expression   {$$ = astCreate(getLineNumber(), AST_VEC_ASSIGNMENT, 0, $1, $3, $6, 0);}
+    identifier ASSIGNMENT expression                        {
+                                                                $$ = astCreate(getLineNumber(), AST_ASSIGNMENT, 0, $1, $3, 0, 0); 
+                                                                $1->symbol->lineNumber = getLineNumber();
+                                                            }
+    | identifier '[' expression ']' ASSIGNMENT expression   {
+                                                                $$ = astCreate(getLineNumber(), AST_VEC_ASSIGNMENT, 0, $1, $3, $6, 0); 
+                                                                $1->symbol->lineNumber = getLineNumber();
+                                                            }
     | read
     | print
     | return
@@ -146,8 +164,14 @@ expressionList:
     ;
 
 expression:
-    identifier                              
-    | identifier '[' expression ']'         {$$ = astCreate(getLineNumber(), AST_VEC_ACESS, 0, $1, $3, 0, 0);}
+    identifier                              {
+                                                $$ = $1; 
+                                                $1->symbol->lineNumber = getLineNumber();
+                                            }
+    | identifier '[' expression ']'         {
+                                                $$ = astCreate(getLineNumber(), AST_VEC_ACESS, 0, $1, $3, 0, 0); 
+                                                $1->symbol->lineNumber = getLineNumber();
+                                            }
     | functionCall                          
     | literal                               
     | '(' expression ')'                    {$$ = astCreate(getLineNumber(), AST_PARENTHESIS, 0, $2, 0, 0, 0);}
@@ -167,8 +191,14 @@ expression:
     ;
 
 read:
-    KW_READ identifier                      {$$ = astCreate(getLineNumber(), AST_READ, 0, $2, 0, 0, 0);}
-    | KW_READ identifier '[' expression ']' {$$ = astCreate(getLineNumber(), AST_VEC_READ, 0, $2, $4, 0, 0);}
+    KW_READ identifier                      {
+                                                $$ = astCreate(getLineNumber(), AST_READ, 0, $2, 0, 0, 0); 
+                                                $2->symbol->lineNumber = getLineNumber();
+                                            }
+    | KW_READ identifier '[' expression ']' {
+                                                $$ = astCreate(getLineNumber(), AST_VEC_READ, 0, $2, $4, 0, 0); 
+                                                $2->symbol->lineNumber = getLineNumber();
+                                            }
     ;
 
 printList:
@@ -209,7 +239,10 @@ identifier:
     ;
 
 functionCall:
-    identifier '(' expressionList ')'   {$$ = astCreate(getLineNumber(), AST_FUNC_CALL, 0, $1, $3, 0, 0);}
+    identifier '(' expressionList ')'   {
+                                            $$ = astCreate(getLineNumber(), AST_FUNC_CALL, 0, $1, $3, 0, 0); 
+                                            $1->symbol->lineNumber = getLineNumber();
+                                        }
     ;
 
 literalList:

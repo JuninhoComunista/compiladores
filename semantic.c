@@ -12,7 +12,7 @@ void checkUndeclared(HashTable *table) {
     for (int i = 0; i < table->size; i++) {
         if (table->nodes[i]) {
             if (table->nodes[i]->type == SYMBOL_IDENTIFIER) {
-                fprintf(stderr, "Undeclared identifier %s\n", table->nodes[i]->value);
+                fprintf(stderr, "Error at line %d: Undeclared identifier %s\n",table->nodes[i]->lineNumber,  table->nodes[i]->value);
                 semanticErrors++;
             }
             if (table->overflowBuckets[i]) {
