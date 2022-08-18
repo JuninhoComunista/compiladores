@@ -1,7 +1,7 @@
 %{
     //Nome: Nicolas Paris - Cartao: 302650
     #include "hash.h"
-    #include "symbolTypes.h"
+    #include "types.h"
     #include "semantic.h"
     #include "ast.h"
     #include "y.tab.h"
@@ -77,8 +77,6 @@
 .                   {return TOKEN_ERROR;}
 
 %%
-
-#include "main.h"
 
 int isRunning() {
     return running;

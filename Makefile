@@ -1,5 +1,5 @@
 etapa4: lex.yy.o main.o hash.o ast.o semantic.o decompiler.o y.tab
-	gcc -Wall -o etapa4 -g y.tab.c lex.yy.o main.o hash.o ast.o decompiler.o
+	gcc -Wall -o etapa4 -g y.tab.c lex.yy.o main.o hash.o ast.o decompiler.o semantic.o
 main.o: main.c
 	gcc -Wall -c -g main.c
 decompiler.o: decompiler.c

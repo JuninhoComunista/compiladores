@@ -86,7 +86,11 @@ program:
                             printf("\nPrinting tree\n\n");
                             astPrint($1, 0, treeFile);
                             decompile($1, yyout);
-                            runOnce($1, identifiersTable);
+                            int errors = runOnce($1, identifiersTable);
+                            if (errors) {
+                                fprintf(stderr, "Semantic errors: %d\n", errors);
+                                exit(4);
+                            }
                         }
     ;
 

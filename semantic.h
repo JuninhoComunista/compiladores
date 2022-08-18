@@ -6,4 +6,4 @@
 #include "ast.h"
 
 void assignDeclaration(Ast *node);
-void runOnce(Ast *node, HashTable *table);
+int runOnce(Ast *node, HashTable *table);
