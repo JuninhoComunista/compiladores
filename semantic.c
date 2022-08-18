@@ -11,20 +11,27 @@ int isCompatibleDeclaration(Ast *node) {
     }
     
     if (node->symbol) { //is VecDec
-        switch(node->son[0]->type) {
-            case AST_CHAR:
-                if (node->symbol->dataType != DT_CHAR) 
-                    return 0;
-                break;
-            case AST_INT:
-                if (node->symbol->dataType != DT_INT)
-                    return 0;  
-                break;
-            case AST_FLOAT:
-                if (node->symbol->dataType != DT_FLOAT)
-                    return 0;  
-                break;
-        }
+        if (node->son[2]) {
+            Ast *list = node->son[2];
+            while(list) {
+                switch(node->son[0]->type) {
+                case AST_CHAR:
+                    if (list->son[0]->symbol->dataType != DT_CHAR) 
+                        return 0;
+                    break;
+                case AST_INT:
+                    if (list->son[0]->symbol->dataType != DT_INT)
+                        return 0;  
+                    break;
+                case AST_FLOAT:
+                    if (list->son[0]->symbol->dataType != DT_FLOAT)
+                        return 0;  
+                    break;
+                }
+            
+                list = list->son[1];
+            }
+        } 
     } else {    //is VarDec
         switch(node->son[0]->type) {
             case AST_CHAR:
@@ -43,6 +50,7 @@ int isCompatibleDeclaration(Ast *node) {
     }
     return 1;
 }
+
 void checkCompatibility(Ast *node) {
     return;
 }
