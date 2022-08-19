@@ -9,23 +9,31 @@ int isCompatibleDeclaration(Ast *node) {
         fprintf(stderr, "Would segfault!\n");
         return -1;
     }
+
+    int dataType;
     
     if (node->symbol) { //is VecDec
         if (node->son[2]) {
             Ast *list = node->son[2];
             while(list) {
                 switch(node->son[0]->type) {
-                case AST_CHAR:
+                case AST_CHAR: {
                     if (list->son[0]->symbol->dataType != DT_CHAR) 
                         return 0;
+                    dataType = DT_CHAR;
+                }
                     break;
-                case AST_INT:
+                case AST_INT: {
                     if (list->son[0]->symbol->dataType != DT_INT)
                         return 0;  
+                    dataType = DT_INT;
+                }
                     break;
-                case AST_FLOAT:
+                case AST_FLOAT: {
                     if (list->son[0]->symbol->dataType != DT_FLOAT)
-                        return 0;  
+                        return 0;
+                    dataType = DT_FLOAT;
+                }
                     break;
                 }
             
@@ -34,21 +42,27 @@ int isCompatibleDeclaration(Ast *node) {
         } 
     } else {    //is VarDec
         switch(node->son[0]->type) {
-            case AST_CHAR:
+            case AST_CHAR: {
                 if (node->son[2]->symbol->dataType != DT_CHAR) 
                     return 0;
+                dataType = DT_CHAR;
+            }
                 break;
-            case AST_INT:
+            case AST_INT: {
                 if (node->son[2]->symbol->dataType != DT_INT)
-                    return 0;  
+                    return 0;
+                dataType = DT_INT;
+            }
                 break;
-            case AST_FLOAT:
+            case AST_FLOAT: {
                 if (node->son[2]->symbol->dataType != DT_FLOAT)
-                    return 0;  
+                    return 0;
+                dataType = DT_FLOAT;
+            }
                 break;
         }
     }
-    return 1;
+    return dataType;
 }
 
 void checkCompatibility(Ast *node) {
@@ -84,8 +98,9 @@ void assignDeclaration(Ast *node) {
 
     switch(node->type) {
         case AST_VAR_DEC: {
-            if (!isCompatibleDeclaration(node)) {
-                fprintf(stderr, "Error at line %d: Incompatible data types\n", node->lineNumber);
+            int dataType = isCompatibleDeclaration(node);
+            if (!dataType) {
+                fprintf(stderr, "Error at line %d: Incompatible data types at declaration of -> %s\n", node->lineNumber, node->son[1]->symbol->value);
                 semanticErrors++;
                 break;
             } 
@@ -97,11 +112,13 @@ void assignDeclaration(Ast *node) {
             } 
 
             node->son[1]->symbol->type = ID_TYPE_ESC;
+            node->son[1]->symbol->dataType = dataType;
         }
         break;
         case AST_VEC_DEC: {
-            if (!isCompatibleDeclaration(node)) {
-                fprintf(stderr, "Error at line %d: Incompatible data types\n", node->lineNumber);
+            int dataType = isCompatibleDeclaration(node);
+            if (!dataType) {
+                fprintf(stderr, "Error at line %d: Incompatible data types at declaration of -> %s\n", node->lineNumber, node->son[1]->symbol->value);
                 semanticErrors++;
                 break;
             } 
@@ -113,6 +130,7 @@ void assignDeclaration(Ast *node) {
             } 
 
             node->son[1]->symbol->type = ID_TYPE_VEC;
+            node->son[1]->symbol->dataType = dataType;
         }
         break;
         case AST_FUNC_DEC: {
