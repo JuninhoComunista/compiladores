@@ -15,29 +15,34 @@ int isCompatibleDeclaration(Ast *node) {
     if (node->symbol) { //is VecDec
         if (node->son[2]) {
             Ast *list = node->son[2];
-            while(list) {
-                switch(node->son[0]->type) {
+            switch(node->son[0]->type) {
                 case AST_CHAR: {
-                    if (list->son[0]->symbol->dataType != DT_CHAR) 
-                        return 0;
+                    while(list) {
+                        if (list->son[0]->symbol->dataType != DT_CHAR) 
+                            return 0;
+                        list = list->son[1];
+                    } 
                     dataType = DT_CHAR;
                 }
-                    break;
+                break;
                 case AST_INT: {
-                    if (list->son[0]->symbol->dataType != DT_INT)
-                        return 0;  
+                    while(list) {
+                        if (list->son[0]->symbol->dataType != DT_INT) 
+                            return 0;
+                        list = list->son[1];
+                    } 
                     dataType = DT_INT;
                 }
-                    break;
+                break;
                 case AST_FLOAT: {
-                    if (list->son[0]->symbol->dataType != DT_FLOAT)
-                        return 0;
+                    while(list) {
+                        if (list->son[0]->symbol->dataType != DT_FLOAT) 
+                            return 0;
+                        list = list->son[1];
+                    } 
                     dataType = DT_FLOAT;
                 }
-                    break;
-                }
-            
-                list = list->son[1];
+                break;
             }
         } 
     } else {    //is VarDec
@@ -137,7 +142,22 @@ void assignDeclaration(Ast *node) {
             if (node->son[1]->symbol->type != SYMBOL_IDENTIFIER) {
                 fprintf(stderr, "Error at line %d: Function %s already declared\n", node->son[1]->lineNumber, node->son[1]->symbol->value);
                 semanticErrors++;
-            } 
+            }
+
+            switch(node->son[0]->type) {
+                case AST_CHAR: {
+                    node->son[1]->symbol->dataType = DT_CHAR;
+                }
+                    break;
+                case AST_INT: {
+                    node->son[1]->symbol->dataType = DT_INT;
+                }
+                    break;
+                case AST_FLOAT: {
+                    node->son[1]->symbol->dataType = DT_FLOAT;
+                }
+                    break;
+            }
 
             node->son[1]->symbol->type = ID_TYPE_FUNC;
         }

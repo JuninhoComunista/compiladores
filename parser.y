@@ -84,9 +84,10 @@ program:
                                 printf("Cannot open tree.txt\n");
                             }
                             printf("\nPrinting tree\n\n");
+    
+                            int errors = runOnce($1, identifiersTable);
                             astPrint($1, 0, treeFile);
                             decompile($1, yyout);
-                            int errors = runOnce($1, identifiersTable);
                             if (errors) {
                                 fprintf(stderr, "Semantic errors: %d\n", errors);
                                 exit(4);

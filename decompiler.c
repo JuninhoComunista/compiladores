@@ -246,8 +246,11 @@ void decompileBlock(Ast *node, FILE *output) {
         Ast *list = node->son[0];
         while(list->son[1]) {
             decompileCmd(list->son[0], output);
-            fprintf(output, ";\n");
             list = list->son[1];
+            if (list->son[1])
+                fprintf(output, ";\n");
+            else
+                fprintf(output, "\n");
         }
         decompileCmd(list->son[0], output);
         fprintf(output, "\n");
@@ -280,6 +283,7 @@ void decompileFuncDec(Ast *node, FILE *output) {
     }
     fprintf(output, ")");
     decompileBlock(node->son[3], output);
+    fprintf(output, "\n");
 }
 
 void decompileDecList(Ast *node, FILE *output) {
