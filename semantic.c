@@ -8,6 +8,20 @@ int getExpressionDataType(Ast *node) {
     return 0;
 }
 
+int isCompatibleDataType(int type1, int type2) {
+    if(type1 == DT_FLOAT && type2 != DT_FLOAT)
+        return 0;
+    
+    if(type1 == DT_BOOL && type2 != DT_BOOL)
+        return 0;
+
+    if((type1 == DT_INT || type1 == DT_CHAR) && 
+        (type2 != DT_INT && type2 != DT_CHAR))
+        return 0;
+
+    return 1;
+}
+
 int getDataType(Ast *node) {
     if (!node) {
         fprintf(stderr, "Would segfault!\n");
@@ -44,8 +58,7 @@ int isCompatibleDeclaration(Ast *node) {
                     return DT_CHAR;
                 while(list) {
                     arraySize++;
-                    if (list->son[0]->symbol->dataType != DT_CHAR &&
-                        list->son[0]->symbol->dataType != DT_INT)
+                    if (!isCompatibleDataType(list->son[0]->symbol->dataType, DT_CHAR))
                         return 0;
                     list = list->son[1];
                 }
@@ -59,8 +72,7 @@ int isCompatibleDeclaration(Ast *node) {
                     return DT_INT;
                 while(list) {
                     arraySize++;
-                    if (list->son[0]->symbol->dataType != DT_CHAR &&
-                        list->son[0]->symbol->dataType != DT_INT) 
+                    if (!isCompatibleDataType(list->son[0]->symbol->dataType, DT_INT))
                         return 0;
                     list = list->son[1];
                 }
@@ -74,7 +86,7 @@ int isCompatibleDeclaration(Ast *node) {
                     return DT_FLOAT;
                 while(list) {
                     arraySize++;
-                    if (list->son[0]->symbol->dataType != DT_FLOAT) 
+                    if (!isCompatibleDataType(list->son[0]->symbol->dataType, DT_FLOAT))
                         return 0;
                     list = list->son[1];
                 }
@@ -89,21 +101,19 @@ int isCompatibleDeclaration(Ast *node) {
     if (node->type == AST_VAR_DEC) {
         switch(node->son[0]->type) {
             case AST_CHAR: {
-                if (node->son[2]->symbol->dataType != DT_CHAR &&
-                    node->son[2]->symbol->dataType != DT_INT) 
+                if (!isCompatibleDataType(node->son[2]->symbol->dataType, DT_CHAR)) 
                     return 0;
 
                 return DT_CHAR;
             }
             case AST_INT: {
-                if (node->son[2]->symbol->dataType != DT_CHAR &&
-                    node->son[2]->symbol->dataType != DT_INT)
+                if (!isCompatibleDataType(node->son[2]->symbol->dataType, DT_INT)) 
                     return 0;
 
                 return DT_INT;
             }
             case AST_FLOAT: {
-                if (node->son[2]->symbol->dataType != DT_FLOAT)
+                if (!isCompatibleDataType(node->son[2]->symbol->dataType, DT_FLOAT)) 
                     return 0;
 
                 return DT_FLOAT;
@@ -112,6 +122,24 @@ int isCompatibleDeclaration(Ast *node) {
     }
 
     return 0;
+}
+
+void checkReturnDataType(Ast *node) {
+    if(!node)
+        return;
+    
+    Ast *cmdList = node->son[3]->son[0];
+    while(cmdList) {
+        if(!cmdList->son[0])
+            return;
+        
+        if(cmdList->son[0]->type == AST_RETURN &&
+            !isCompatibleDataType(getExpressionDataType(cmdList->son[0]->son[0]), node->son[1]->symbol->dataType)) {
+            fprintf(stderr, "Error at line %d: Incompatible return for function -> %s", cmdList->lineNumber, node->son[1]->symbol->value);
+        }
+
+        cmdList = cmdList->son[1];
+    }
 }
 
 void checkCorrectUsage(Ast *node) {
@@ -125,10 +153,23 @@ void checkCorrectUsage(Ast *node) {
     }
 
     switch(node->type) {
+        case AST_FUNC_DEC: {
+            checkReturnDataType(node);
+        }
+        break;
         case AST_ASSIGNMENT: {
             if (node->son[0]->symbol->type != ID_TYPE_ESC &&
                 node->son[0]->symbol->type != SYMBOL_UNDECLARED) {  //Already informed error
-                fprintf(stderr, "Error at line %d: Incorrect usage of array variable -> %s\n",node->son[0]->lineNumber,  node->son[0]->symbol->value);
+                fprintf(stderr, "Error at line %d: Incorrect usage of array variable -> %s\n",node->lineNumber,  node->son[0]->symbol->value);
+                semanticErrors++;
+            }
+            //TODO check expression type
+        }
+        break;
+        case AST_READ: {
+            if (node->son[0]->symbol->type != ID_TYPE_ESC &&
+                node->son[0]->symbol->type != SYMBOL_UNDECLARED) {  //Already informed error
+                fprintf(stderr, "Error at line %d: Incorrect usage of array variable -> %s\n",node->lineNumber,  node->son[0]->symbol->value);
                 semanticErrors++;
             }
         }
@@ -136,9 +177,19 @@ void checkCorrectUsage(Ast *node) {
         case AST_VEC_ASSIGNMENT: {
             if (node->son[0]->symbol->type != ID_TYPE_VEC &&
                 node->son[0]->symbol->type != SYMBOL_UNDECLARED) {  //Already informed error
-                fprintf(stderr, "Error at line %d: Incorrect usage of escalar variable -> %s\n",node->son[0]->lineNumber,  node->son[0]->symbol->value);
+                fprintf(stderr, "Error at line %d: Incorrect usage of escalar variable -> %s\n",node->lineNumber,  node->son[0]->symbol->value);
                 semanticErrors++;
             }
+            //TODO check expression type
+        }
+        break;
+        case AST_VEC_READ: {
+            if (node->son[0]->symbol->type != ID_TYPE_VEC &&
+                node->son[0]->symbol->type != SYMBOL_UNDECLARED) {  //Already informed error
+                fprintf(stderr, "Error at line %d: Incorrect usage of escalar variable -> %s\n",node->lineNumber,  node->son[0]->symbol->value);
+                semanticErrors++;
+            }
+            //TODO check expression type
         }
         break;
     }
@@ -221,6 +272,7 @@ void assignDeclaration(Ast *node) {
             if (node->son[1]->symbol->type != SYMBOL_IDENTIFIER) {
                 fprintf(stderr, "Error at line %d: Function %s already declared\n", node->son[1]->lineNumber, node->son[1]->symbol->value);
                 semanticErrors++;
+                break;
             }
 
             Ast *paramList = node->son[2];
