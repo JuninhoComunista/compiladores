@@ -4,10 +4,6 @@
 
 int semanticErrors = 0;
 
-int getExpressionDataType(Ast *node) {
-    return 0;
-}
-
 int isCompatibleDataType(int type1, int type2) {
     if(type1 == DT_FLOAT && type2 != DT_FLOAT)
         return 0;
@@ -20,6 +16,19 @@ int isCompatibleDataType(int type1, int type2) {
         return 0;
 
     return 1;
+}
+
+int getExpressionDataType(Ast *node) {
+    switch(node->type) {
+        case AST_IDENTIFIER:
+        case AST_LITERAL: {
+            return node->symbol->dataType;
+        }
+        case AST_VEC_ACESS: {
+            return isCompatibleDataType(getExpressionDataType(node->son[1]), DT_INT);
+        }
+    }
+    return 0;
 }
 
 int getDataType(Ast *node) {
@@ -135,7 +144,8 @@ void checkReturnDataType(Ast *node) {
         
         if(cmdList->son[0]->type == AST_RETURN &&
             !isCompatibleDataType(getExpressionDataType(cmdList->son[0]->son[0]), node->son[1]->symbol->dataType)) {
-            fprintf(stderr, "Error at line %d: Incompatible return for function -> %s", cmdList->lineNumber, node->son[1]->symbol->value);
+            fprintf(stderr, "Error at line %d: Incompatible return for function -> %s\n", node->son[1]->lineNumber, node->son[1]->symbol->value);
+            semanticErrors++;
         }
 
         cmdList = cmdList->son[1];
