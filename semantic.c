@@ -15,10 +15,13 @@ int isCompatibleDataType(int type1, int type2) {
         (type2 != DT_INT && type2 != DT_CHAR))
         return 0;
 
-    return 1;
+    return type1;
 }
 
 int getExpressionDataType(Ast *node) {
+    if(!node) 
+        return 0;
+    
     switch(node->type) {
         case AST_IDENTIFIER:
         case AST_LITERAL: {
@@ -27,6 +30,35 @@ int getExpressionDataType(Ast *node) {
         case AST_VEC_ACESS: {
             return isCompatibleDataType(getExpressionDataType(node->son[1]), DT_INT);
         }
+        case AST_PARENTHESIS: {
+            return getExpressionDataType(node->son[0]);
+        }
+        case AST_ADD:
+        case AST_SUB:
+        case AST_MUL:
+        case AST_DIV: {
+            return isCompatibleDataType(getExpressionDataType(node->son[0]), getExpressionDataType(node->son[1]));
+        }
+        case AST_LES:
+        case AST_GRE:
+        case AST_OR:
+        case AST_AND:
+        case AST_LE:
+        case AST_GE:
+        case AST_EQ:
+        case AST_DIF: {
+            if (node->son[0]->son[0])
+                return 0;
+
+            if(!isCompatibleDataType(node->son[0]->symbol->dataType, node->son[1]->symbol->dataType))
+                return 0;
+            
+            return DT_BOOL;
+        }
+        case AST_NOT: {
+            return isCompatibleDataType(getExpressionDataType(node->son[0]), DT_BOOL);
+        }
+        
     }
     return 0;
 }
@@ -63,14 +95,19 @@ int isCompatibleDeclaration(Ast *node) {
         Ast *list = node->son[2];
         switch(node->son[0]->type) {
             case AST_CHAR: {
+                if(atoi(node->symbol->value) <= 0)
+                    return -1;
+
                 if (!list)
                     return DT_CHAR;
+
                 while(list) {
                     arraySize++;
                     if (!isCompatibleDataType(list->son[0]->symbol->dataType, DT_CHAR))
                         return 0;
                     list = list->son[1];
                 }
+
                 if (arraySize != atoi(node->symbol->value))
                     return -1;
 
@@ -158,50 +195,92 @@ void checkCorrectUsage(Ast *node) {
 
     int i;
 
-    for (i=0; i<MAX_SONS; i++) {
-        checkCorrectUsage(node->son[i]);
-    }
-
     switch(node->type) {
         case AST_FUNC_DEC: {
             checkReturnDataType(node);
         }
         break;
         case AST_ASSIGNMENT: {
-            if (node->son[0]->symbol->type != ID_TYPE_ESC &&
-                node->son[0]->symbol->type != SYMBOL_UNDECLARED) {  //Already informed error
+            if (node->son[0]->symbol->type == SYMBOL_UNDECLARED)
+                break;
+
+            if (node->son[0]->symbol->type != ID_TYPE_ESC) { 
                 fprintf(stderr, "Error at line %d: Incorrect usage of array variable -> %s\n",node->lineNumber,  node->son[0]->symbol->value);
                 semanticErrors++;
+                break;
             }
-            //TODO check expression type
+            
+            if (!isCompatibleDataType(getExpressionDataType(node->son[1]), node->son[0]->symbol->dataType)) {
+                fprintf(stderr, "Error at line %d: Incompatible data types at assignment of -> %s\n", node->lineNumber, node->son[0]->symbol->value);
+                semanticErrors++;
+                break;
+            }
         }
         break;
         case AST_READ: {
-            if (node->son[0]->symbol->type != ID_TYPE_ESC &&
-                node->son[0]->symbol->type != SYMBOL_UNDECLARED) {  //Already informed error
+            if (node->son[0]->symbol->type == SYMBOL_UNDECLARED)
+                break;
+
+            if (node->son[0]->symbol->type != ID_TYPE_ESC) {
                 fprintf(stderr, "Error at line %d: Incorrect usage of array variable -> %s\n",node->lineNumber,  node->son[0]->symbol->value);
                 semanticErrors++;
+                break;
             }
         }
         break;
         case AST_VEC_ASSIGNMENT: {
-            if (node->son[0]->symbol->type != ID_TYPE_VEC &&
-                node->son[0]->symbol->type != SYMBOL_UNDECLARED) {  //Already informed error
+            if (node->son[0]->symbol->type == SYMBOL_UNDECLARED)
+                break;
+
+            if (node->son[0]->symbol->type != ID_TYPE_VEC) {  
                 fprintf(stderr, "Error at line %d: Incorrect usage of escalar variable -> %s\n",node->lineNumber,  node->son[0]->symbol->value);
                 semanticErrors++;
+                break;
             }
-            //TODO check expression type
+            
+            if (!isCompatibleDataType(getExpressionDataType(node->son[1]), DT_INT)) {
+                fprintf(stderr, "Error at line %d: Incompatible data type at index of array -> %s\n", node->lineNumber, node->son[0]->symbol->value);
+                semanticErrors++;
+                break;
+            }
+
+            if (!isCompatibleDataType(getExpressionDataType(node->son[2]), node->son[0]->symbol->dataType)) {
+                fprintf(stderr, "Error at line %d: Incompatible data types at assignment of -> %s\n", node->lineNumber, node->son[0]->symbol->value);
+                semanticErrors++;
+                break;
+            }
         }
         break;
         case AST_VEC_READ: {
-            if (node->son[0]->symbol->type != ID_TYPE_VEC &&
-                node->son[0]->symbol->type != SYMBOL_UNDECLARED) {  //Already informed error
+            if (node->son[0]->symbol->type == SYMBOL_UNDECLARED)
+                break;
+
+            if (node->son[0]->symbol->type != ID_TYPE_VEC) {  //Already informed error
                 fprintf(stderr, "Error at line %d: Incorrect usage of escalar variable -> %s\n",node->lineNumber,  node->son[0]->symbol->value);
                 semanticErrors++;
+                break;
             }
-            //TODO check expression type
+
+            if (!isCompatibleDataType(getExpressionDataType(node->son[1]), DT_INT)) {
+                fprintf(stderr, "Error at line %d: Incompatible data type at index of array -> %s\n", node->lineNumber, node->son[0]->symbol->value);
+                semanticErrors++;
+                break;
+            }
         }
         break;
+        case AST_WHILE: 
+        case AST_IF: 
+        case AST_IF_ELSE: {
+            if (!isCompatibleDataType(getExpressionDataType(node->son[0]), DT_BOOL)) {
+                fprintf(stderr, "Error at line %d: Incompatible data type at flux control expression\n", node->lineNumber);
+                break;
+            }
+        }
+        break;
+    }
+
+    for (i=0; i<MAX_SONS; i++) {
+        checkCorrectUsage(node->son[i]);
     }
 }
 
