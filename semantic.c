@@ -3,8 +3,14 @@
 #include "semantic.h"
 
 int semanticErrors = 0;
+Ast *program;
+
+int getExpressionDataType(Ast *node);
 
 int isCompatibleDataType(int type1, int type2) {
+    if(type1 == -1 || type2 == -1) 
+        return -1;
+
     if(type1 == DT_FLOAT && type2 != DT_FLOAT)
         return 0;
     
@@ -16,6 +22,47 @@ int isCompatibleDataType(int type1, int type2) {
         return 0;
 
     return type1;
+}
+
+int checkFuncCall(Ast *node) {
+    Ast *decList = program;
+    Ast* dec;
+    int declarationCount = 0, callCount = 0;
+    while(decList) {
+        dec = decList->son[0];
+        decList = decList->son[1];
+        if (dec->type == AST_FUNC_DEC) {
+            if (strcmp(dec->son[1]->symbol->value, node->son[0]->symbol->value)) 
+                continue;
+            
+            Ast *expressionList = node->son[1];
+            Ast *paramList = dec->son[2];
+            while(expressionList) {
+                callCount++;
+                if (!paramList) {
+                    fprintf(stderr, "Error at line %d: More parameters then needed for function -> %s\n", node->lineNumber, node->son[0]->symbol->value);
+                    semanticErrors++;
+                    return -1;
+                }
+                
+                if (!isCompatibleDataType(paramList->son[0]->dataType, getExpressionDataType(expressionList->son[0]))) {
+                    fprintf(stderr, "Error at line %d: Incompatible function parameter data type at -> %s\n", node->lineNumber, node->son[0]->symbol->value);
+                    semanticErrors++;
+                    return -1;
+                }
+                    
+                declarationCount++;
+                paramList = paramList->son[1];
+                expressionList = expressionList->son[1];
+            }
+            if (paramList) {
+                fprintf(stderr, "Error at line %d: Less parameters then needed for function -> %s\n", node->lineNumber, node->son[0]->symbol->value);
+                semanticErrors++;
+                return -1;
+            }
+        }
+    }
+    return node->son[0]->symbol->dataType;
 }
 
 int getExpressionDataType(Ast *node) {
@@ -32,6 +79,9 @@ int getExpressionDataType(Ast *node) {
         }
         case AST_PARENTHESIS: {
             return getExpressionDataType(node->son[0]);
+        }
+        case AST_FUNC_CALL: {
+            return checkFuncCall(node);
         }
         case AST_ADD:
         case AST_SUB:
@@ -204,6 +254,9 @@ void checkCorrectUsage(Ast *node) {
             if (node->son[0]->symbol->type == SYMBOL_UNDECLARED)
                 break;
 
+            if (isCompatibleDataType(getExpressionDataType(node->son[1]), node->son[0]->symbol->dataType) == -1)
+                break;
+
             if (node->son[0]->symbol->type != ID_TYPE_ESC) { 
                 fprintf(stderr, "Error at line %d: Incorrect usage of array variable -> %s\n",node->lineNumber,  node->son[0]->symbol->value);
                 semanticErrors++;
@@ -232,6 +285,12 @@ void checkCorrectUsage(Ast *node) {
             if (node->son[0]->symbol->type == SYMBOL_UNDECLARED)
                 break;
 
+            if (isCompatibleDataType(getExpressionDataType(node->son[1]), DT_INT) == -1)
+                break;
+
+            if (isCompatibleDataType(getExpressionDataType(node->son[2]), node->son[0]->symbol->dataType) == -1)
+                break;
+
             if (node->son[0]->symbol->type != ID_TYPE_VEC) {  
                 fprintf(stderr, "Error at line %d: Incorrect usage of escalar variable -> %s\n",node->lineNumber,  node->son[0]->symbol->value);
                 semanticErrors++;
@@ -255,6 +314,9 @@ void checkCorrectUsage(Ast *node) {
             if (node->son[0]->symbol->type == SYMBOL_UNDECLARED)
                 break;
 
+            if (isCompatibleDataType(getExpressionDataType(node->son[1]), DT_INT) == -1)
+                break;
+
             if (node->son[0]->symbol->type != ID_TYPE_VEC) {  //Already informed error
                 fprintf(stderr, "Error at line %d: Incorrect usage of escalar variable -> %s\n",node->lineNumber,  node->son[0]->symbol->value);
                 semanticErrors++;
@@ -271,6 +333,9 @@ void checkCorrectUsage(Ast *node) {
         case AST_WHILE: 
         case AST_IF: 
         case AST_IF_ELSE: {
+            if (isCompatibleDataType(getExpressionDataType(node->son[0]), DT_BOOL) == -1)
+                break;
+
             if (!isCompatibleDataType(getExpressionDataType(node->son[0]), DT_BOOL)) {
                 fprintf(stderr, "Error at line %d: Incompatible data type at flux control expression\n", node->lineNumber);
                 break;
@@ -367,6 +432,7 @@ void assignDeclaration(Ast *node) {
             Ast *paramList = node->son[2];
 
             while(paramList) {
+                paramList->son[0]->dataType = getDataType(paramList->son[0]->son[0]);
                 paramList->son[0]->son[1]->symbol->dataType = getDataType(paramList->son[0]->son[0]);
                 paramList->son[0]->son[1]->symbol->type = ID_TYPE_ESC;
                 paramList = paramList->son[1];
@@ -384,6 +450,7 @@ void assignDeclaration(Ast *node) {
 }
 
 int runOnce(Ast *node, HashTable *table) {
+    program = node;
     assignDeclaration(node);
     checkUndeclared(table);
     checkCorrectUsage(node);

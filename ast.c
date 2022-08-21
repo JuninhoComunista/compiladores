@@ -86,7 +86,7 @@ void astPrintNode(Ast *node, FILE *output) {
     }
 
     if (node->dataType) {
-        fprintf(output, "dataType= %d", node->dataType);
+        fprintf(output, " | dataType= %d", node->dataType);
     }
 
     fprintf(output, "\n");
