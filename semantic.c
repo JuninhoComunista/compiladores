@@ -4,6 +4,26 @@
 
 int semanticErrors = 0;
 
+int getDataType(Ast *node) {
+    if (!node) {
+        fprintf(stderr, "Would segfault!\n");
+        return 0;
+    }
+
+    switch(node->type) {
+        case AST_CHAR: {
+            return DT_CHAR;
+        }
+        case AST_INT: {
+            return DT_INT;
+        }
+        case AST_FLOAT: {
+            return DT_FLOAT;
+        }
+    }
+    return 0;
+}
+
 int isCompatibleDeclaration(Ast *node) {
     if (!node) {
         fprintf(stderr, "Would segfault!\n");
@@ -13,14 +33,15 @@ int isCompatibleDeclaration(Ast *node) {
     int dataType;
     int arraySize = 0;
     
-    if (node->symbol) { //is VecDec
+    if (node->type == AST_VEC_DEC) {
         if (node->son[2]) {
             Ast *list = node->son[2];
             switch(node->son[0]->type) {
                 case AST_CHAR: {
                     while(list) {
                         arraySize++;
-                        if (list->son[0]->symbol->dataType != DT_CHAR) 
+                        if (list->son[0]->symbol->dataType != DT_CHAR &&
+                            list->son[0]->symbol->dataType != DT_INT)
                             return 0;
                         list = list->son[1];
                     }
@@ -31,34 +52,46 @@ int isCompatibleDeclaration(Ast *node) {
                 break;
                 case AST_INT: {
                     while(list) {
-                        if (list->son[0]->symbol->dataType != DT_INT) 
+                        arraySize++;
+                        if (list->son[0]->symbol->dataType != DT_CHAR &&
+                            list->son[0]->symbol->dataType != DT_INT) 
                             return 0;
                         list = list->son[1];
-                    } 
+                    }
+                    if (arraySize != atoi(node->symbol->value))
+                        return -1;
                     dataType = DT_INT;
                 }
                 break;
                 case AST_FLOAT: {
                     while(list) {
+                        arraySize++;
                         if (list->son[0]->symbol->dataType != DT_FLOAT) 
                             return 0;
                         list = list->son[1];
-                    } 
+                    }
+                    if (arraySize != atoi(node->symbol->value))
+                        return -1;
                     dataType = DT_FLOAT;
                 }
                 break;
             }
         } 
-    } else {    //is VarDec
+        return dataType;
+    }  
+    
+    if (node->type == AST_VAR_DEC) {
         switch(node->son[0]->type) {
             case AST_CHAR: {
-                if (node->son[2]->symbol->dataType != DT_CHAR) 
+                if (node->son[2]->symbol->dataType != DT_CHAR &&
+                    node->son[2]->symbol->dataType != DT_INT) 
                     return 0;
                 dataType = DT_CHAR;
             }
                 break;
             case AST_INT: {
-                if (node->son[2]->symbol->dataType != DT_INT)
+                if (node->son[2]->symbol->dataType != DT_CHAR &&
+                    node->son[2]->symbol->dataType != DT_INT)
                     return 0;
                 dataType = DT_INT;
             }
@@ -70,12 +103,40 @@ int isCompatibleDeclaration(Ast *node) {
             }
                 break;
         }
+        return dataType;
     }
-    return dataType;
+
+    return 0;
 }
 
 void checkCompatibility(Ast *node) {
     return;
+}
+
+void checkCorrectUsage(Ast *node) {
+    if(!node)
+        return;
+
+    int i;
+
+    switch(node->type) {
+        case AST_VAR_DEC: {
+            
+        }
+        break;
+        case AST_VEC_DEC: {
+            
+        }
+        break;
+        case AST_FUNC_DEC: {
+            
+        }
+        break;
+    }
+    
+    for (i=0; i<MAX_SONS; i++) {
+        checkCorrectUsage(node->son[i]);
+    }
 }
 
 void checkUndeclared(HashTable *table) {
@@ -132,7 +193,7 @@ void assignDeclaration(Ast *node) {
                 semanticErrors++;
                 break;
             }
-
+            
             if (!dataType) {
                 fprintf(stderr, "Error at line %d: Incompatible data types at declaration of -> %s\n", node->lineNumber, node->son[1]->symbol->value);
                 semanticErrors++;
@@ -155,21 +216,15 @@ void assignDeclaration(Ast *node) {
                 semanticErrors++;
             }
 
-            switch(node->son[0]->type) {
-                case AST_CHAR: {
-                    node->son[1]->symbol->dataType = DT_CHAR;
-                }
-                break;
-                case AST_INT: {
-                    node->son[1]->symbol->dataType = DT_INT;
-                }
-                break;
-                case AST_FLOAT: {
-                    node->son[1]->symbol->dataType = DT_FLOAT;
-                }
-                break;
+            Ast *list = node->son[2];
+
+            while(list) {
+                list->son[0]->son[1]->symbol->dataType = getDataType(list->son[0]->son[0]);
+                list->son[0]->son[1]->symbol->type = ID_TYPE_ESC;
+                list = list->son[1];
             }
 
+            node->son[1]->symbol->dataType = getDataType(node->son[0]);
             node->son[1]->symbol->type = ID_TYPE_FUNC;
         }
         break;
