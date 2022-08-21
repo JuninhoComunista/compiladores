@@ -14,3 +14,4 @@
 #define SYMBOL_FLOAT            60
 #define SYMBOL_CHAR             61
 #define SYMBOL_STRING           62
+#define SYMBOL_UNDECLARED       63
