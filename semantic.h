@@ -5,5 +5,4 @@
 #include "hash.h"
 #include "ast.h"
 
-void assignDeclaration(Ast *node);
 int runOnce(Ast *node, HashTable *table);

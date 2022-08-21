@@ -7,10 +7,11 @@ int semanticErrors = 0;
 int isCompatibleDeclaration(Ast *node) {
     if (!node) {
         fprintf(stderr, "Would segfault!\n");
-        return -1;
+        return 0;
     }
 
     int dataType;
+    int arraySize = 0;
     
     if (node->symbol) { //is VecDec
         if (node->son[2]) {
@@ -18,10 +19,13 @@ int isCompatibleDeclaration(Ast *node) {
             switch(node->son[0]->type) {
                 case AST_CHAR: {
                     while(list) {
+                        arraySize++;
                         if (list->son[0]->symbol->dataType != DT_CHAR) 
                             return 0;
                         list = list->son[1];
-                    } 
+                    }
+                    if (arraySize != atoi(node->symbol->value))
+                        return -1;
                     dataType = DT_CHAR;
                 }
                 break;
@@ -84,8 +88,8 @@ void checkUndeclared(HashTable *table) {
             if (table->overflowBuckets[i]) {
                 LinkedList *head = table->overflowBuckets[i];
                 while (head) {
-                    if (table->nodes[i]->type == SYMBOL_IDENTIFIER) {
-                        fprintf(stderr, "Undeclared identifier %s\n", table->nodes[i]->value);
+                    if (head->node->type == SYMBOL_IDENTIFIER) {
+                        fprintf(stderr, "Error at line %d: Undeclared identifier %s\n", head->node->lineNumber, head->node->value);
                         semanticErrors++;
                     }
                     head = head->next;
@@ -122,6 +126,13 @@ void assignDeclaration(Ast *node) {
         break;
         case AST_VEC_DEC: {
             int dataType = isCompatibleDeclaration(node);
+
+            if (dataType == -1) {
+                fprintf(stderr, "Error at line %d: Incompatible quantity of itens at initialization of -> %s\n", node->lineNumber, node->son[1]->symbol->value);
+                semanticErrors++;
+                break;
+            }
+
             if (!dataType) {
                 fprintf(stderr, "Error at line %d: Incompatible data types at declaration of -> %s\n", node->lineNumber, node->son[1]->symbol->value);
                 semanticErrors++;
@@ -148,15 +159,15 @@ void assignDeclaration(Ast *node) {
                 case AST_CHAR: {
                     node->son[1]->symbol->dataType = DT_CHAR;
                 }
-                    break;
+                break;
                 case AST_INT: {
                     node->son[1]->symbol->dataType = DT_INT;
                 }
-                    break;
+                break;
                 case AST_FLOAT: {
                     node->son[1]->symbol->dataType = DT_FLOAT;
                 }
-                    break;
+                break;
             }
 
             node->son[1]->symbol->type = ID_TYPE_FUNC;
