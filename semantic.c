@@ -337,7 +337,7 @@ void checkCorrectUsage(Ast *node) {
                 break;
 
             if (!isCompatibleDataType(getExpressionDataType(node->son[0]), DT_BOOL)) {
-                fprintf(stderr, "Error at line %d: Incompatible data type at flux control expression\n", node->lineNumber);
+                fprintf(stderr, "Error at line %d: Incompatible data type at flow control expression\n", node->lineNumber);
                 break;
             }
         }

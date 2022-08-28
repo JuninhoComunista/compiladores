@@ -18,4 +18,4 @@ y.tab: parser.y
 	yacc -d parser.y
 
 clean:
-	rm lex.yy.* y.tab.* *.o etapa4 output.txt tree.txt
+	rm lex.yy.* y.tab.* *.o etapa4 output.txt tree.txt etapa4.tgz
