@@ -262,12 +262,34 @@ void checkCorrectUsage(Ast *node) {
                 semanticErrors++;
                 break;
             }
-            
+  
             if (!isCompatibleDataType(getExpressionDataType(node->son[1]), node->son[0]->symbol->dataType)) {
                 fprintf(stderr, "Error at line %d: Incompatible data types at assignment of -> %s\n", node->lineNumber, node->son[0]->symbol->value);
                 semanticErrors++;
                 break;
             }
+
+            switch(node->son[1]->type) {
+                case AST_IDENTIFIER:
+                    if (node->son[1]->symbol->type != ID_TYPE_ESC) {
+                        fprintf(stderr, "Error at line %d: \"%s\" does not represent an escalar\n",node->lineNumber,  node->son[1]->symbol->value);
+                        semanticErrors++;
+                    }
+                break;
+                case AST_VEC_ACESS:
+                    if (node->son[1]->son[0]->symbol->type != ID_TYPE_VEC) {
+                        fprintf(stderr, "Error at line %d: \"%s\" does not represent an array\n",node->lineNumber,  node->son[1]->son[0]->symbol->value);
+                        semanticErrors++;
+                    }   
+                break;
+                case AST_FUNC_CALL:
+                    if (node->son[1]->son[0]->symbol->type != ID_TYPE_FUNC) {
+                        fprintf(stderr, "Error at line %d: \"%s\" does not represent a function\n",node->lineNumber,  node->son[1]->son[0]->symbol->value);
+                        semanticErrors++;
+                    }   
+                break;
+            }
+            // fprintf(stderr, "Value %s\n", node->son[1]->symbol->value);
         }
         break;
         case AST_READ: {
@@ -317,7 +339,7 @@ void checkCorrectUsage(Ast *node) {
             if (isCompatibleDataType(getExpressionDataType(node->son[1]), DT_INT) == -1)
                 break;
 
-            if (node->son[0]->symbol->type != ID_TYPE_VEC) {  //Already informed error
+            if (node->son[0]->symbol->type != ID_TYPE_VEC) { 
                 fprintf(stderr, "Error at line %d: Incorrect usage of escalar variable -> %s\n",node->lineNumber,  node->son[0]->symbol->value);
                 semanticErrors++;
                 break;
