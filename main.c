@@ -5,6 +5,7 @@
 #include <stdio.h>
 
 int yylex();
+int yyparse();
 void initMe();
 extern char* yytext;
 extern int lineCount;
