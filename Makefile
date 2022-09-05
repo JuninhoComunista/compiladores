@@ -1,5 +1,5 @@
-etapa4: lex.yy.o main.o hash.o ast.o semantic.o decompiler.o y.tab
-	gcc -Wall -o etapa4 -g y.tab.c lex.yy.o main.o hash.o ast.o decompiler.o semantic.o
+etapa5: lex.yy.o main.o hash.o ast.o semantic.o decompiler.o y.tab
+	gcc -Wall -o etapa5 -g y.tab.c lex.yy.o main.o hash.o ast.o decompiler.o semantic.o
 main.o: main.c
 	gcc -Wall -c -g main.c
 decompiler.o: decompiler.c
@@ -18,4 +18,4 @@ y.tab: parser.y
 	yacc -d parser.y
 
 clean:
-	rm lex.yy.* y.tab.* *.o etapa4 output.txt tree.txt etapa4.tgz
+	rm lex.yy.* y.tab.* *.o etapa5 output.txt tree.txt etapa5.tgz

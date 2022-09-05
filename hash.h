@@ -43,3 +43,5 @@ HashNode* hashInsert(HashTable* table, char* key, char* value, int type);
 HashNode* hashSearch(HashTable* table, char* key);
 void handleCollision(HashTable* table, unsigned long index, HashNode* node);
 void printTable(HashTable* table);
+HashNode* makeTemp();
+HashNode* makeLabel();

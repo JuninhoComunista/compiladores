@@ -1,3 +1,3 @@
 make clean
 make
-./etapa4 test.txt output.txt
+./etapa5 test.txt output.txt

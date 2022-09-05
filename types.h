@@ -16,3 +16,6 @@
 #define SYMBOL_CHAR             62
 #define SYMBOL_STRING           63
 #define SYMBOL_UNDECLARED       64
+
+#define SYMBOL_TEMP             65
+#define SYMBOL_LABEL            66
