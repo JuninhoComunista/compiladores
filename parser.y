@@ -4,6 +4,7 @@
     #include <stdlib.h>
     #include "semantic.h"
     #include "decompiler.h"
+    #include "tac.h"
     extern FILE *yyout;
     extern HashTable* identifiersTable;
     int yyerror();
@@ -92,6 +93,8 @@ program:
                                 fprintf(stderr, "Semantic errors: %d\n", errors);
                                 exit(4);
                             }
+                            // generateCode($1, identifiersTable);
+                            tacPrintBack(generateCode($1, identifiersTable), stderr);
                         }
     ;
 

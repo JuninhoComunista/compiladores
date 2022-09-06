@@ -203,7 +203,7 @@ HashNode* makeTemp(HashTable* table) {
     static char buffer[512] = "";
     static int nextTemp = 0;
 
-    sprintf(buffer, "temp-%d", nextTemp++);
+    sprintf(buffer, "_temp%d", nextTemp++);
     return hashInsert(table, buffer, buffer, SYMBOL_TEMP);
 }
 
@@ -211,6 +211,6 @@ HashNode* makeLabel(HashTable* table) {
     static char buffer[512] = "";
     static int nextLabel = 0;
 
-    sprintf(buffer, "label-%d", nextLabel++);
+    sprintf(buffer, "_label%d", nextLabel++);
     return hashInsert(table, buffer, buffer, SYMBOL_LABEL);
 }
