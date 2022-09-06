@@ -40,6 +40,7 @@ void tacPrintSingle(Tac *tac, FILE *output) {
         case TAC_COPY: fprintf(output, "TAC_COPY"); break;
         case TAC_IFZ: fprintf(output, "TAC_IFZ"); break;
         case TAC_LABEL: fprintf(output, "TAC_LABEL"); break;
+        case TAC_JUMP: fprintf(output, "TAC_JUMP"); break;
         case TAC_ADD: fprintf(output, "TAC_ADD"); break;
         case TAC_SUB: fprintf(output, "TAC_SUB"); break;
         case TAC_MUL: fprintf(output, "TAC_MUL"); break;
@@ -94,6 +95,27 @@ Tac* makeIfThen(Tac *code0, Tac *code1, HashTable *table) {
     return tacJoin(tacJoin(tacJoin(code0, ifTac), code1), labelTac);
 }
 
+Tac* makeWhile(Tac *code0, Tac *code1, HashTable *table) {
+
+    HashNode *labelBefore = makeLabel(table);
+    HashNode *labelAfter = makeLabel(table);
+
+    Tac *labelBeforeTac = tacCreate(TAC_LABEL, labelBefore, 0, 0);
+    tacJoin(labelBeforeTac, code0);
+
+    Tac *ifTac = tacCreate(TAC_IFZ, labelAfter, code0 ? code0->res : 0, 0);
+    ifTac->prev = code0;
+
+    Tac *jump = tacCreate(TAC_JUMP, labelBefore, 0, 0);
+    jump->prev = code1;
+
+    Tac *labelAfterTac = tacCreate(TAC_LABEL, labelAfter, 0, 0);
+    labelAfterTac->prev = jump;
+
+    tacJoin(ifTac, jump);
+    return labelAfterTac;
+}
+
 Tac* generateCode(Ast *node, HashTable *table) {
     if (!node)
         return 0;
@@ -112,6 +134,8 @@ Tac* generateCode(Ast *node, HashTable *table) {
         case AST_ADD ... AST_DIF: result = makeBinOp(node->type, code[0], code[1], table);
             break;
         case AST_ASSIGNMENT: result = tacJoin(code[1], tacCreate(TAC_COPY, code[0] ? code[0]->res : 0, code[1] ? code[1]->res : 0, 0));
+            break;
+        case AST_WHILE: result = makeWhile(code[0], code[1], table);
             break;
         default: result = tacJoin(tacJoin(tacJoin(code[0], code[1]), code[2]), code[3]);
             break;

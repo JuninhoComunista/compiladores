@@ -6,9 +6,10 @@
 #include "ast.h"
 
 #define TAC_SYMBOL 1
-#define TAC_COPY 3
-#define TAC_IFZ 4
-#define TAC_LABEL 5
+#define TAC_COPY 2
+#define TAC_IFZ 3
+#define TAC_LABEL 4
+#define TAC_JUMP 5
 #define TAC_ADD             14
 #define TAC_SUB             15
 #define TAC_MUL             16
