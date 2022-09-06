@@ -6,7 +6,7 @@
 #include "ast.h"
 
 #define TAC_SYMBOL 1
-#define TAC_COPY 2
+#define TAC_MOVE 2
 #define TAC_IFZ 3
 #define TAC_LABEL 4
 #define TAC_JUMP 5

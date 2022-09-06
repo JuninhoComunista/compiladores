@@ -44,7 +44,8 @@ void tacPrintSingle(Tac *tac, FILE *output) {
     
     fprintf(output, "Tac(");
     switch(tac->type) {
-        case TAC_COPY: fprintf(output, "TAC_COPY"); break;
+        case TAC_SYMBOL: fprintf(output, "TAC_SYMBOL"); break;
+        case TAC_MOVE: fprintf(output, "TAC_MOVE"); break;
         case TAC_IFZ: fprintf(output, "TAC_IFZ"); break;
         case TAC_LABEL: fprintf(output, "TAC_LABEL"); break;
         case TAC_JUMP: fprintf(output, "TAC_JUMP"); break;
@@ -152,6 +153,17 @@ Tac* makeWhile(Tac *code0, Tac *code1, HashTable *table) {
     return labelAfterTac;
 }
 
+Tac* makeVecDec(Tac *code1, Tac *code2, int vecSize) {
+    Tac *aux = code2;
+    Tac *ret = code2;
+    
+    for (int index = 0; index < vecSize; index++) {
+        ret = tacJoin(tacCreate(TAC_MOVE, code1 ? code1->res : 0, aux ? aux->res : 0, 0), ret);
+        aux = aux->prev;
+    }
+    return tacJoin(ret, code1);
+}
+
 Tac* generateCode(Ast *node, HashTable *table) {
     if (!node)
         return 0;
@@ -171,7 +183,7 @@ Tac* generateCode(Ast *node, HashTable *table) {
         case AST_ADD ... AST_NOT: 
             result = makeBinOp(node->type, code[0], code[1], table); break;
         case AST_ASSIGNMENT: 
-            result = tacJoin(code[1], tacCreate(TAC_COPY, code[0] ? code[0]->res : 0, code[1] ? code[1]->res : 0, 0)); break;
+            result = tacJoin(code[1], tacCreate(TAC_MOVE, code[0] ? code[0]->res : 0, code[1] ? code[1]->res : 0, 0)); break;
         case AST_IF: 
             result = makeIf(code[0], code[1], table); break;
         case AST_IF_ELSE: 
@@ -184,6 +196,10 @@ Tac* generateCode(Ast *node, HashTable *table) {
             result = tacCreate(TAC_READ, code[0] ? code[0]->res : 0, 0, 0); break;
         case AST_VEC_READ:
             result = tacJoin(code[1], tacCreate(TAC_READ, code[0] ? code[0]->res : 0, code[1] ? code[1]->res : 0 ,0)); break;
+        case AST_VAR_DEC:
+            result = tacCreate(TAC_MOVE, code[1] ? code[1]->res : 0, code[2] ? code[2]->res : 0, 0); break;
+        case AST_VEC_DEC:
+            result = makeVecDec(code[1], code[2], atoi(node->symbol->value)); break;
         default: 
             result = tacJoin(tacJoin(tacJoin(code[0], code[1]), code[2]), code[3]);
             break;
