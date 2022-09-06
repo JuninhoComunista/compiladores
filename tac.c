@@ -48,6 +48,8 @@ void tacPrintSingle(Tac *tac, FILE *output) {
         case TAC_IFZ: fprintf(output, "TAC_IFZ"); break;
         case TAC_LABEL: fprintf(output, "TAC_LABEL"); break;
         case TAC_JUMP: fprintf(output, "TAC_JUMP"); break;
+        case TAC_PRINT: fprintf(output, "TAC_PRINT"); break;
+        case TAC_READ: fprintf(output, "TAC_READ"); break;
         case TAC_ADD: fprintf(output, "TAC_ADD"); break;
         case TAC_SUB: fprintf(output, "TAC_SUB"); break;
         case TAC_MUL: fprintf(output, "TAC_MUL"); break;
@@ -59,6 +61,7 @@ void tacPrintSingle(Tac *tac, FILE *output) {
         case TAC_LE: fprintf(output, "TAC_LE"); break;
         case TAC_GE: fprintf(output, "TAC_GE"); break;
         case TAC_DIF: fprintf(output, "TAC_DIF"); break;
+        case TAC_NOT: fprintf(output, "TAC_NOT"); break;
     }
     if (tac->res)
         fprintf(output, ", %s", tac->res->value);
@@ -163,8 +166,9 @@ Tac* generateCode(Ast *node, HashTable *table) {
 
     switch(node->type) {
         case AST_IDENTIFIER: 
+        case AST_LITERAL:
             result = tacCreate(TAC_SYMBOL, node->symbol, 0, 0); break;
-        case AST_ADD ... AST_DIF: 
+        case AST_ADD ... AST_NOT: 
             result = makeBinOp(node->type, code[0], code[1], table); break;
         case AST_ASSIGNMENT: 
             result = tacJoin(code[1], tacCreate(TAC_COPY, code[0] ? code[0]->res : 0, code[1] ? code[1]->res : 0, 0)); break;
@@ -174,6 +178,12 @@ Tac* generateCode(Ast *node, HashTable *table) {
             result = makeIfElse(code[0], code[1], code[2], table); break;
         case AST_WHILE: 
             result = makeWhile(code[0], code[1], table); break;
+        case AST_PRINT:
+            result = tacJoin(code[0], tacCreate(TAC_PRINT, code[0] ? code[0]->res : 0, 0, 0)); break;
+        case AST_READ:
+            result = tacCreate(TAC_READ, code[0] ? code[0]->res : 0, 0, 0); break;
+        case AST_VEC_READ:
+            result = tacJoin(code[1], tacCreate(TAC_READ, code[0] ? code[0]->res : 0, code[1] ? code[1]->res : 0 ,0)); break;
         default: 
             result = tacJoin(tacJoin(tacJoin(code[0], code[1]), code[2]), code[3]);
             break;

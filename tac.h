@@ -10,6 +10,8 @@
 #define TAC_IFZ 3
 #define TAC_LABEL 4
 #define TAC_JUMP 5
+#define TAC_PRINT 6
+#define TAC_READ 7
 #define TAC_ADD     (AST_ADD)
 #define TAC_SUB     (AST_SUB)
 #define TAC_MUL     (AST_MUL)
@@ -22,6 +24,7 @@
 #define TAC_GE      (AST_GE )
 #define TAC_EQ      (AST_EQ )
 #define TAC_DIF     (AST_DIF)   
+#define TAC_NOT     (AST_NOT)   
 
 typedef struct tac_node {
     int type;
