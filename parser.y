@@ -93,8 +93,9 @@ program:
                                 fprintf(stderr, "Semantic errors: %d\n", errors);
                                 exit(4);
                             }
-                            // generateCode($1, identifiersTable);
-                            tacPrintBack(generateCode($1, identifiersTable), stderr);
+                            Tac *tacList = generateCode($1, identifiersTable);
+                            reverseTacList(&tacList);
+                            tacPrintForwards(tacList, stderr);
                         }
     ;
 

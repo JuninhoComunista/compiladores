@@ -10,18 +10,18 @@
 #define TAC_IFZ 3
 #define TAC_LABEL 4
 #define TAC_JUMP 5
-#define TAC_ADD             14
-#define TAC_SUB             15
-#define TAC_MUL             16
-#define TAC_DIV             17
-#define TAC_LES             18
-#define TAC_GRE             19
-#define TAC_OR              20
-#define TAC_AND             21
-#define TAC_LE              22
-#define TAC_GE              23
-#define TAC_EQ              24
-#define TAC_DIF             25    
+#define TAC_ADD     (AST_ADD)
+#define TAC_SUB     (AST_SUB)
+#define TAC_MUL     (AST_MUL)
+#define TAC_DIV     (AST_DIV)
+#define TAC_LES     (AST_LES)
+#define TAC_GRE     (AST_GRE)
+#define TAC_OR      (AST_OR )
+#define TAC_AND     (AST_AND)
+#define TAC_LE      (AST_LE )
+#define TAC_GE      (AST_GE )
+#define TAC_EQ      (AST_EQ )
+#define TAC_DIF     (AST_DIF)   
 
 typedef struct tac_node {
     int type;
@@ -34,6 +34,8 @@ typedef struct tac_node {
 
 Tac* tacCreate(int type, HashNode *res, HashNode *op1, HashNode *op2);
 void tacPrintSingle(Tac *tac, FILE *output);
-void tacPrintBack(Tac *tac, FILE *output);
+void tacPrintBackwards(Tac *tac, FILE *output);
+void tacPrintForwards(Tac *tac, FILE *output);
+void reverseTacList(Tac **list);
 Tac* tacJoin(Tac *l1, Tac *l2);
 Tac* generateCode(Ast *node, HashTable *table);

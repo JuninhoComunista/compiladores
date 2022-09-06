@@ -28,6 +28,13 @@ Tac* tacJoin(Tac *l1, Tac *l2) {
     return l2;
 }
 
+void reverseTacList(Tac **list) {
+    Tac *node;
+    for (node = *list; node->prev; node = node->prev)
+        node->prev->next = node;
+    *list = node;
+}
+
 void tacPrintSingle(Tac *tac, FILE *output) {
     if (!tac || !output)
         return;
@@ -35,7 +42,7 @@ void tacPrintSingle(Tac *tac, FILE *output) {
     if (tac->type == TAC_SYMBOL)
         return;
     
-    fprintf(output, "TAC(");
+    fprintf(output, "Tac(");
     switch(tac->type) {
         case TAC_COPY: fprintf(output, "TAC_COPY"); break;
         case TAC_IFZ: fprintf(output, "TAC_IFZ"); break;
@@ -71,7 +78,13 @@ void tacPrintSingle(Tac *tac, FILE *output) {
     fprintf(output, ")\n");
 }
 
-void tacPrintBack(Tac *tac, FILE *output) {
+void tacPrintForwards(Tac *tac, FILE *output) {
+    Tac *node;
+    for (node = tac; node; node = node->next)
+        tacPrintSingle(node, output);
+}
+
+void tacPrintBackwards(Tac *tac, FILE *output) {
     Tac *node;
     for (node = tac; node; node = node->prev)
         tacPrintSingle(node, output);
@@ -84,7 +97,7 @@ Tac* makeBinOp(int type, Tac *code0, Tac *code1, HashTable *table) {
         );
 }
 
-Tac* makeIfThen(Tac *code0, Tac *code1, HashTable *table) {
+Tac* makeIf(Tac *code0, Tac *code1, HashTable *table) {
     Tac *ifTac;
     Tac *labelTac;
     HashNode *label;
@@ -93,6 +106,26 @@ Tac* makeIfThen(Tac *code0, Tac *code1, HashTable *table) {
     ifTac = tacCreate(TAC_IFZ, label, code0 ? code0->res : 0, 0);
     labelTac = tacCreate(TAC_LABEL, label, 0, 0);
     return tacJoin(tacJoin(tacJoin(code0, ifTac), code1), labelTac);
+}
+
+Tac* makeIfElse(Tac *code0, Tac *code1, Tac* code2, HashTable* table) {
+    HashNode *labelElse = makeLabel(table);
+    HashNode *labelAfterElse = makeLabel(table);
+
+    Tac *jumpzTac = tacCreate(TAC_IFZ, labelElse, code0 ? code0->res : 0, 0);
+    tacJoin(code0, jumpzTac);
+
+    Tac *jumpTac = tacCreate(TAC_JUMP, labelAfterElse, 0, 0);
+    tacJoin(code1, jumpTac);
+
+    Tac *labelElseTac = tacCreate(TAC_LABEL, labelElse, 0, 0);
+    tacJoin(jumpTac, labelElseTac);
+
+    Tac *labelAfterElseTac = tacCreate(TAC_LABEL, labelAfterElse, 0, 0);
+    tacJoin(code2, labelAfterElseTac);
+
+    tacJoin(jumpzTac, jumpTac);
+    return tacJoin(labelElseTac, labelAfterElseTac);
 }
 
 Tac* makeWhile(Tac *code0, Tac *code1, HashTable *table) {
@@ -129,15 +162,20 @@ Tac* generateCode(Ast *node, HashTable *table) {
     }
 
     switch(node->type) {
-        case AST_IDENTIFIER: result = tacCreate(TAC_SYMBOL, node->symbol, 0, 0);
-            break;
-        case AST_ADD ... AST_DIF: result = makeBinOp(node->type, code[0], code[1], table);
-            break;
-        case AST_ASSIGNMENT: result = tacJoin(code[1], tacCreate(TAC_COPY, code[0] ? code[0]->res : 0, code[1] ? code[1]->res : 0, 0));
-            break;
-        case AST_WHILE: result = makeWhile(code[0], code[1], table);
-            break;
-        default: result = tacJoin(tacJoin(tacJoin(code[0], code[1]), code[2]), code[3]);
+        case AST_IDENTIFIER: 
+            result = tacCreate(TAC_SYMBOL, node->symbol, 0, 0); break;
+        case AST_ADD ... AST_DIF: 
+            result = makeBinOp(node->type, code[0], code[1], table); break;
+        case AST_ASSIGNMENT: 
+            result = tacJoin(code[1], tacCreate(TAC_COPY, code[0] ? code[0]->res : 0, code[1] ? code[1]->res : 0, 0)); break;
+        case AST_IF: 
+            result = makeIf(code[0], code[1], table); break;
+        case AST_IF_ELSE: 
+            result = makeIfElse(code[0], code[1], code[2], table); break;
+        case AST_WHILE: 
+            result = makeWhile(code[0], code[1], table); break;
+        default: 
+            result = tacJoin(tacJoin(tacJoin(code[0], code[1]), code[2]), code[3]);
             break;
     }
 
