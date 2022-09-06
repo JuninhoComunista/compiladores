@@ -98,19 +98,19 @@ Tac* makeIfThen(Tac *code0, Tac *code1, HashTable *table) {
 Tac* makeWhile(Tac *code0, Tac *code1, HashTable *table) {
 
     HashNode *labelBefore = makeLabel(table);
-    HashNode *labelAfter = makeLabel(table);
-
     Tac *labelBeforeTac = tacCreate(TAC_LABEL, labelBefore, 0, 0);
     tacJoin(labelBeforeTac, code0);
 
-    Tac *ifTac = tacCreate(TAC_IFZ, labelAfter, code0 ? code0->res : 0, 0);
-    ifTac->prev = code0;
+    HashNode *labelAfter = makeLabel(table);
+    Tac *labelAfterTac = tacCreate(TAC_LABEL, labelAfter, 0, 0);
+
+    Tac *ifTac = tacCreate(TAC_IFZ, labelAfter, code0->res, 0);
+    tacJoin(code0, ifTac);
 
     Tac *jump = tacCreate(TAC_JUMP, labelBefore, 0, 0);
-    jump->prev = code1;
+    tacJoin(code1, jump);
 
-    Tac *labelAfterTac = tacCreate(TAC_LABEL, labelAfter, 0, 0);
-    labelAfterTac->prev = jump;
+    tacJoin(jump, labelAfterTac);
 
     tacJoin(ifTac, jump);
     return labelAfterTac;
