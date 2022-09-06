@@ -360,6 +360,7 @@ void checkCorrectUsage(Ast *node) {
 
             if (!isCompatibleDataType(getExpressionDataType(node->son[0]), DT_BOOL)) {
                 fprintf(stderr, "Error at line %d: Incompatible data type at flow control expression\n", node->lineNumber);
+                semanticErrors++;
                 break;
             }
         }
