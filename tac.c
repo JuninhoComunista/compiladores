@@ -1,4 +1,5 @@
 //Nome: Nicolas Paris - Cartao: 302650
+//Still lacking some features
 
 #include "tac.h"
 
@@ -51,6 +52,10 @@ void tacPrintSingle(Tac *tac, FILE *output) {
         case TAC_JUMP: fprintf(output, "TAC_JUMP"); break;
         case TAC_PRINT: fprintf(output, "TAC_PRINT"); break;
         case TAC_READ: fprintf(output, "TAC_READ"); break;
+        case TAC_VEC_DEC: fprintf(output, "TAC_VEC_DEC"); break;
+        case TAC_BEGIN_FUNC: fprintf(output, "TAC_BEGIN_FUNC"); break;
+        case TAC_END_FUNC: fprintf(output, "TAC_END_FUNC"); break;
+        case TAC_PARAM: fprintf(output, "TAC_PARAM"); break;
         case TAC_ADD: fprintf(output, "TAC_ADD"); break;
         case TAC_SUB: fprintf(output, "TAC_SUB"); break;
         case TAC_MUL: fprintf(output, "TAC_MUL"); break;
@@ -153,18 +158,12 @@ Tac* makeWhile(Tac *code0, Tac *code1, HashTable *table) {
     return labelAfterTac;
 }
 
-Tac* makeVecDec(Tac *code1, Tac *code2, int vecSize) {
-    Tac *aux = code2;
-    Tac *ret = code2;
+Tac* makeFuncDec(Tac *code1, Tac *code2, Tac *code3) {
     
-    for (int index = 0; index < vecSize; index++) {
-        ret = tacJoin(tacCreate(TAC_MOVE, code1 ? code1->res : 0, aux ? aux->res : 0, 0), ret);
-        aux = aux->prev;
-    }
-    return tacJoin(ret, code1);
+    return tacJoin(tacJoin(tacJoin(code2, tacCreate(TAC_BEGIN_FUNC, code1->res, 0, 0)), code3), tacCreate(TAC_END_FUNC, code1->res, 0, 0));
 }
 
-Tac* generateCode(Ast *node, HashTable *table) {
+Tac* generateCode(Ast *node, HashTable *table, char *functionImIn) {
     if (!node)
         return 0;
 
@@ -173,7 +172,11 @@ Tac* generateCode(Ast *node, HashTable *table) {
     Tac *code[MAX_SONS];
 
     for (i = 0; i < MAX_SONS; i++) {
-        code[i] = generateCode(node->son[i], table);
+        if (node->type == AST_FUNC_DEC)
+            code[i] = generateCode(node->son[i], table, node->son[1]->symbol->value);
+        else
+            code[i] = generateCode(node->son[i], table, functionImIn);
+            
     }
 
     switch(node->type) {
@@ -199,7 +202,11 @@ Tac* generateCode(Ast *node, HashTable *table) {
         case AST_VAR_DEC:
             result = tacCreate(TAC_MOVE, code[1] ? code[1]->res : 0, code[2] ? code[2]->res : 0, 0); break;
         case AST_VEC_DEC:
-            result = makeVecDec(code[1], code[2], atoi(node->symbol->value)); break;
+            result = tacJoin(tacCreate(TAC_VEC_DEC, code[1] ? code[1]->res : 0, node->symbol, 0), code[2]); break;
+        case AST_PARAM:
+            result = tacCreate(TAC_PARAM, code[1] ? code[1]->res : 0, hashInsert(table, functionImIn ? functionImIn : 0, functionImIn ? functionImIn : 0, SYMBOL_LABEL), 0); break;
+        case AST_FUNC_DEC:
+            result = makeFuncDec(code[1], code[2], code[3]); break;
         default: 
             result = tacJoin(tacJoin(tacJoin(code[0], code[1]), code[2]), code[3]);
             break;

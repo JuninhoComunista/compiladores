@@ -19,3 +19,4 @@
 
 #define SYMBOL_TEMP             65
 #define SYMBOL_LABEL            66
+#define SYMBOL_FUNC             66

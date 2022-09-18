@@ -12,6 +12,10 @@
 #define TAC_JUMP 5
 #define TAC_PRINT 6
 #define TAC_READ 7
+#define TAC_VEC_DEC 8
+#define TAC_BEGIN_FUNC 9
+#define TAC_END_FUNC 10
+#define TAC_PARAM 11
 #define TAC_ADD     (AST_ADD)
 #define TAC_SUB     (AST_SUB)
 #define TAC_MUL     (AST_MUL)
@@ -41,4 +45,4 @@ void tacPrintBackwards(Tac *tac, FILE *output);
 void tacPrintForwards(Tac *tac, FILE *output);
 void reverseTacList(Tac **list);
 Tac* tacJoin(Tac *l1, Tac *l2);
-Tac* generateCode(Ast *node, HashTable *table);
+Tac* generateCode(Ast *node, HashTable *table, char *functionImIn);
